@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>La Clínica — ד"ר יונתן בהר</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Heebo:wght@200;300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#C9A96E;--gold2:#f0d9a8;--black:#0A0A0A;--white:#fff}
+
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--black);direction:rtl;cursor:none}
+    body{font-family:'Heebo',sans-serif;font-weight:300}
+
+    /* ── CURSOR ── */
+    #cd{width:6px;height:6px;background:var(--gold);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+    #cr{width:34px;height:34px;border:1px solid rgba(201,169,110,.45);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .18s cubic-bezier(.23,1,.32,1),width .3s,height .3s}
+
+    /* ── GRAIN ── */
+    #grain{position:fixed;inset:0;z-index:9990;pointer-events:none;opacity:.03;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:180px 180px;animation:grn .35s steps(1) infinite}
+    @keyframes grn{0%{transform:translate(0,0)}20%{transform:translate(-2%,-3%)}40%{transform:translate(3%,1%)}60%{transform:translate(-1%,4%)}80%{transform:translate(4%,-2%)}100%{transform:translate(-3%,3%)}}
+
+    /* ── CANVAS ── */
+    #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+
+    /* ── PROGRESSIVE BLUR BOTTOM ── */
+    #pblur{position:fixed;bottom:0;left:0;right:0;height:220px;z-index:2;pointer-events:none;
+      background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,.8) 30%,rgba(10,10,10,.4) 60%,transparent 100%)}
+
+    /* ── SVG LIQUID FILTER ── */
+    #lgf{position:absolute;width:0;height:0;overflow:hidden}
+
+    /* ── MAIN CONTENT ── */
+    #stage{position:relative;z-index:5;width:100%;height:100dvh;min-height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:clamp(72px,12vh,120px) 24px 118px}
+
+    /* Logo / monogram */
+    .mono{
+      font-family:'Cormorant Garamond',serif;font-weight:300;
+      font-size:clamp(5rem,14vw,10rem);line-height:1;letter-spacing:.08em;
+      background:linear-gradient(135deg,#C9A96E 0%,#f0d9a8 40%,#C9A96E 65%,#9a7040 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 50px rgba(201,169,110,.35));
+      opacity:0;animation:fadeD .9s ease .2s forwards
+    }
+    .brand{
+      font-family:'Cormorant Garamond',serif;font-weight:300;
+      font-size:clamp(.85rem,2.2vw,1.2rem);letter-spacing:.55em;
+      color:var(--white);text-transform:uppercase;margin-bottom:.4em;
+      opacity:0;animation:fadeD .9s ease .5s forwards
+    }
+    .dr{
+      font-size:.68rem;letter-spacing:.28em;color:var(--gold);
+      text-transform:uppercase;font-weight:200;margin-bottom:3em;
+      opacity:0;animation:fadeD .9s ease .7s forwards
+    }
+    .byline{
+      display:inline-flex;align-items:center;gap:12px;
+      font-family:'Cormorant Garamond',serif;font-size:.92rem;letter-spacing:.2em;
+      color:rgba(255,255,255,.66);text-transform:uppercase;
+      margin:-1.7em auto 2.7em;opacity:0;animation:fadeD .9s ease .78s forwards
+    }
+    .byline::before,.byline::after{content:'';width:28px;height:1px;background:rgba(201,169,110,.35)}
+    .byline span{color:var(--gold2)}
+    .divider{width:44px;height:1px;background:var(--gold);margin:0 auto 2.5em;opacity:0;animation:fadeIn .9s ease .85s forwards}
+
+    /* Liquid glass enter button */
+    .btn-enter{
+      position:relative;display:inline-block;
+      padding:15px 52px;cursor:pointer;border:none;background:none;
+      font-family:'Heebo',sans-serif;font-weight:300;font-size:.78rem;
+      letter-spacing:.26em;text-transform:uppercase;color:var(--gold);
+      opacity:0;animation:fadeIn .9s ease 1.1s forwards;
+      transition:color .35s;text-decoration:none
+    }
+    .btn-enter:hover{color:var(--white)}
+    .btn-bg{
+      position:absolute;inset:0;border-radius:2px;
+      border:1px solid rgba(201,169,110,.35);
+      background:rgba(255,255,255,.04);
+      backdrop-filter:blur(14px) url("#lgd");-webkit-backdrop-filter:blur(14px);
+      box-shadow:inset 1px 1px 1px rgba(255,255,255,.12),inset -1px -1px 1px rgba(255,255,255,.04),0 8px 32px rgba(0,0,0,.3);
+      transition:all .4s;overflow:hidden
+    }
+    .btn-enter:hover .btn-bg{background:rgba(201,169,110,.12);border-color:rgba(201,169,110,.6);box-shadow:inset 1px 1px 1px rgba(255,255,255,.2),0 8px 40px rgba(201,169,110,.18)}
+    .btn-shine{
+      position:absolute;top:-50%;left:-60%;width:40%;height:200%;
+      background:linear-gradient(105deg,transparent,rgba(255,255,255,.08),transparent);
+      transform:skewX(-20deg);transition:left .65s ease
+    }
+    .btn-enter:hover .btn-shine{left:130%}
+    .btn-txt{position:relative;z-index:1}
+
+    /* Sub label */
+    .sub{font-size:.62rem;letter-spacing:.22em;color:rgba(255,255,255,.28);text-transform:uppercase;margin-top:2.4em;opacity:0;animation:fadeIn 1s ease 1.4s forwards}
+
+    /* ── MARQUEE (Infinite slider) ── */
+    #marquee-wrap{
+      position:fixed;bottom:52px;left:0;right:0;z-index:6;
+      overflow:hidden;padding:10px 0;
+      mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);
+      -webkit-mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);
+      opacity:0;animation:fadeIn 1s ease 1.6s forwards
+    }
+    .marquee-track{
+      display:flex;gap:60px;width:max-content;
+      animation:mq 28s linear infinite
+    }
+    @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .mq-item{
+      display:flex;align-items:center;gap:14px;
+      font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(201,169,110,.45);white-space:nowrap;font-weight:200
+    }
+    .mq-dot{width:3px;height:3px;background:rgba(201,169,110,.3);border-radius:50%;flex-shrink:0}
+
+    /* ── PAGE TRANSITION ── */
+    #veil{position:fixed;inset:0;background:var(--black);z-index:9997;pointer-events:none;opacity:0;transition:opacity .6s ease}
+    #veil.on{opacity:1;pointer-events:all}
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeD{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    @media(max-width:600px){
+      html,body{overflow:hidden}
+      #stage{min-height:100dvh;padding:82px 22px 128px}
+      .brand{font-size:.82rem;letter-spacing:.42em;margin-inline:-.42em}
+      .mono{font-size:clamp(4.9rem,31vw,7.4rem);letter-spacing:.035em}
+      .dr{max-width:320px;margin-bottom:2.4em;font-size:.62rem;line-height:1.8;letter-spacing:.18em}
+      .byline{margin:-1.4em auto 2.35em;font-size:.82rem;letter-spacing:.14em;gap:10px}
+      .byline::before,.byline::after{width:20px}
+      .btn-enter{width:min(100%,285px);padding:16px 22px;font-size:.74rem;letter-spacing:.18em}
+      .sub{max-width:310px;font-size:.58rem;line-height:1.8;letter-spacing:.14em;margin-top:2em}
+      #marquee-wrap{bottom:max(22px,env(safe-area-inset-bottom));padding:8px 0}
+      .marquee-track{gap:34px;animation-duration:34s}
+      .mq-item{font-size:.56rem;letter-spacing:.16em;gap:10px}
+      #pblur{height:180px}
+      #cd,#cr{display:none}
+      body{cursor:auto}
+    }
+    @media (hover:none), (pointer:coarse){
+      #cd,#cr{display:none}
+      body{cursor:auto}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cd"></div><div id="cr"></div>
+<!-- Grain -->
+<div id="grain"></div>
+<!-- Page veil for transition -->
+<div id="veil"></div>
+<!-- Liquid glass SVG filter -->
+<svg id="lgf" aria-hidden="true">
+  <defs>
+    <filter id="lgd" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06 0.06" numOctaves="2" seed="3" result="noise"/>
+      <feGaussianBlur in="noise" stdDeviation="1.5" result="bn"/>
+      <feDisplacementMap in="SourceGraphic" in2="bn" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation=".8"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- Canvas background -->
+<canvas id="bg"></canvas>
+
+<!-- Progressive blur overlay -->
+<div id="pblur"></div>
+
+<!-- Main stage -->
+<div id="stage">
+  <div class="brand">La Clínica</div>
+  <div class="mono">JB</div>
+  <div class="dr">Dr. Jonathan Behar Grünfeld &nbsp;·&nbsp; רפואה אסתטית</div>
+  <div class="byline">by <span>La Clínica</span></div>
+  <div class="divider"></div>
+  <a class="btn-enter" href="#" onclick="enterSite(event)">
+    <div class="btn-bg"><div class="btn-shine"></div></div>
+    <span class="btn-txt">כניסה לאתר</span>
+  </a>
+  <p class="sub">Touch Clinic Israel &nbsp;·&nbsp; נהריה &nbsp;·&nbsp; ישראל</p>
+</div>
+
+<!-- Marquee -->
+<div id="marquee-wrap">
+  <div class="marquee-track" id="mtrack"></div>
+</div>
+
+<script>
+/* ── CANVAS ── */
+(function(){
+  const cv=document.getElementById('bg'),ctx=cv.getContext('2d');
+  let W,H,beams=[],orbs=[],pts=[];
+
+  function resize(){
+    W=cv.width=innerWidth; H=cv.height=innerHeight;
+    beams=[]; pts=[];
+    for(let i=0;i<6;i++) beams.push({x:Math.random()*W,y:H+Math.random()*H,w:1+Math.random()*2.2,l:H*2.2,ang:-25+Math.random()*14,spd:.1+Math.random()*.18,op:.04+Math.random()*.07,p:Math.random()*Math.PI*2,ps:.008+Math.random()*.01});
+    orbs=[{x:.18,y:.35,r:350,spd:.00022,ang:0,c:[201,169,110]},{x:.82,y:.65,r:260,spd:.0003,ang:Math.PI,c:[180,140,80]},{x:.5,y:.88,r:200,spd:.0004,ang:Math.PI*.6,c:[220,185,130]}];
+    for(let i=0;i<50;i++) pts.push({x:Math.random()*W,y:Math.random()*H,r:.5+Math.random()*1,op:.06+Math.random()*.18,vx:(Math.random()-.5)*.12,vy:-.04-Math.random()*.12});
+  }
+
+  function drawOrb(o,t){
+    const ox=W*(o.x+.04*Math.cos(o.ang+t*o.spd*1000)),oy=H*(o.y+.03*Math.sin(o.ang+t*o.spd*1400));
+    const g=ctx.createRadialGradient(ox,oy,0,ox,oy,o.r);
+    const [r,g2,b]=o.c;
+    g.addColorStop(0,`rgba(${r},${g2},${b},.1)`);g.addColorStop(.5,`rgba(${r},${g2},${b},.04)`);g.addColorStop(1,`rgba(${r},${g2},${b},0)`);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(ox,oy,o.r,0,Math.PI*2);ctx.fill();
+  }
+
+  function drawBeam(b){
+    ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.ang*Math.PI/180);
+    const po=b.op*(0.7+Math.sin(b.p)*.4),g=ctx.createLinearGradient(0,0,0,b.l);
+    g.addColorStop(0,`rgba(201,169,110,0)`);g.addColorStop(.2,`rgba(201,169,110,${po*.5})`);g.addColorStop(.5,`rgba(201,169,110,${po})`);g.addColorStop(.8,`rgba(201,169,110,${po*.5})`);g.addColorStop(1,`rgba(201,169,110,0)`);
+    ctx.fillStyle=g;ctx.filter=`blur(2px)`;ctx.fillRect(-b.w/2,0,b.w,b.l);ctx.restore();
+  }
+
+  let last=0;
+  function render(ts){
+    const t=ts*.001;
+    ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
+    orbs.forEach(o=>drawOrb(o,t));
+    beams.forEach(b=>{b.y-=b.spd;b.p+=b.ps;if(b.y+b.l<-20){b.y=H+50;b.x=Math.random()*W;}drawBeam(b);});
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.y<-4){p.y=H+4;p.x=Math.random()*W;}ctx.save();ctx.globalAlpha=p.op;ctx.fillStyle='#C9A96E';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();});
+    requestAnimationFrame(render);
+  }
+  window.addEventListener('resize',resize);resize();requestAnimationFrame(render);
+})();
+
+/* ── CURSOR ── */
+(function(){
+  const cd=document.getElementById('cd'),cr=document.getElementById('cr');
+  let rx=0,ry=0,mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  function upd(){cd.style.left=mx+'px';cd.style.top=my+'px';rx+=(mx-rx)*.14;ry+=(my-ry)*.14;cr.style.left=rx+'px';cr.style.top=ry+'px';requestAnimationFrame(upd);}
+  requestAnimationFrame(upd);
+})();
+
+/* ── MARQUEE ── */
+(function(){
+  const services=['נוירומודולטור','PRP פלסמה','הרמוניזציה','Skin Booster','ריינומודלינג','PRP שיער','תחת העיניים','הגדלת שפתיים','סקלרוזה ורידית'];
+  const track=document.getElementById('mtrack');
+  // duplicate for seamless loop
+  [...services,...services].forEach(s=>{
+    const d=document.createElement('div');
+    d.className='mq-item';
+    d.innerHTML=`<span class="mq-dot"></span>${s}`;
+    track.appendChild(d);
+  });
+})();
+
+/* ── ENTER TRANSITION ── */
+function enterSite(e){
+  e.preventDefault();
+  document.getElementById('veil').classList.add('on');
+  setTimeout(()=>{ window.location.href='la-clinica-hebrew.html'; },650);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — La Clínica · Dr. Jonathan Behar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js" onerror="console.warn('firebase-config.js not found — Firebase disabled')"></script>
+  <style>
+    /* ═══════════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════════ */
+    :root {
+      --gold:   #C9A96E;
+      --gold2:  #dfc08e;
+      --gold3:  #a07840;
+      --black:  #0A0A0A;
+      --dark:   #111111;
+      --dark2:  #181818;
+      --dark3:  #1e1e1e;
+      --paper:  #fbfaf7;
+      --line:   #e7dfd1;
+      --soft:   #f4efe6;
+      --white:  #ffffff;
+      --ok:     #357a4f;
+      --warn:   #9a6a16;
+      --err:    #8b2e2e;
+      --muted:  #777777;
+      --sidebar-w: 280px;
+      --topbar-h:  64px;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --shadow: 0 2px 16px rgba(0,0,0,.18);
+      --shadow-sm: 0 1px 6px rgba(0,0,0,.12);
+      --trans: 180ms ease;
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: 'Heebo', sans-serif;
+      font-weight: 400;
+      color: #222;
+      background: var(--paper);
+      overflow-x: hidden;
+    }
+    h1,h2,h3,h4 { font-family: 'Cormorant Garamond', serif; font-weight: 500; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    input, textarea, select {
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: #222;
+      transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,169,110,.15);
+    }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold2); }
+    img { max-width: 100%; display: block; }
+
+    /* ═══════════════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(201,169,110,.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(201,169,110,.6); }
+
+    /* ═══════════════════════════════════════════════
+       LOGIN SCREEN
+    ═══════════════════════════════════════════════ */
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; min-height: 100vh;
+    }
+    .login-left {
+      flex: 1; background: var(--dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px;
+      position: relative; overflow: hidden;
+    }
+    .login-left::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 40%, rgba(201,169,110,.12) 0%, transparent 65%);
+    }
+    .login-left::after {
+      content: '';
+      position: absolute; bottom: -80px; right: -80px;
+      width: 320px; height: 320px; border-radius: 50%;
+      border: 1px solid rgba(201,169,110,.08);
+    }
+    .login-brand { position: relative; z-index: 1; text-align: center; }
+    .login-brand-logo {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--dark);
+      font-weight: 600; margin: 0 auto 28px; letter-spacing: 1px;
+      box-shadow: 0 0 0 8px rgba(201,169,110,.1);
+    }
+    .login-brand h1 {
+      color: var(--white); font-size: 30px; font-weight: 400; letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .login-brand .login-subtitle {
+      color: var(--gold); font-size: 11px; letter-spacing: 3.5px; text-transform: uppercase;
+      font-family: 'Heebo', sans-serif;
+    }
+    .login-brand-tagline {
+      color: rgba(255,255,255,.3); margin-top: 44px;
+      font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 18px;
+      font-weight: 300; letter-spacing: .5px;
+    }
+    .login-right {
+      width: 460px; background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      padding: 48px 56px;
+    }
+    .login-form-wrap { width: 100%; max-width: 340px; }
+    .login-form-wrap h2 {
+      font-size: 28px; color: var(--dark); margin-bottom: 6px; font-weight: 500;
+    }
+    .login-form-wrap .login-sub {
+      color: var(--muted); font-size: 13.5px; margin-bottom: 36px; line-height: 1.5;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: #555; margin-bottom: 8px;
+    }
+    .form-group input {
+      width: 100%; padding: 12px 14px; font-size: 14px;
+    }
+    .login-error {
+      background: #fff5f5; border: 1px solid #fecaca;
+      color: var(--err); padding: 11px 14px; border-radius: var(--radius-sm);
+      font-size: 13px; margin-bottom: 18px; display: none;
+    }
+    .btn-primary {
+      width: 100%; padding: 13px; background: var(--dark); color: var(--gold);
+      font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; border-radius: var(--radius-sm);
+      transition: background var(--trans), transform var(--trans), box-shadow var(--trans);
+    }
+    .btn-primary:hover {
+      background: #1a1a1a; transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(0,0,0,.2);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════
+       MAIN APP
+    ═══════════════════════════════════════════════ */
+    #app { display: none; min-height: 100vh; }
+    #app.visible { display: flex; }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════════ */
+    #sidebar {
+      width: var(--sidebar-w); background: var(--dark);
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 200;
+      display: flex; flex-direction: column;
+      border-right: 1px solid rgba(201,169,110,.1);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      flex-shrink: 0;
+    }
+    .sidebar-brand-inner {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sidebar-logo-circle {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 16px;
+      color: var(--dark); font-weight: 700;
+    }
+    .sidebar-brand-text { flex: 1; min-width: 0; }
+    .sidebar-brand-name {
+      color: var(--white); font-size: 13.5px; font-weight: 600;
+      line-height: 1.2; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-brand-role {
+      color: rgba(201,169,110,.6); font-size: 10px; letter-spacing: 1.5px;
+      text-transform: uppercase; margin-top: 2px;
+    }
+
+    .sidebar-nav { flex: 1; padding: 8px 0; }
+    .nav-section-label {
+      color: rgba(255,255,255,.2); font-size: 9.5px; letter-spacing: 1.8px;
+      text-transform: uppercase; padding: 16px 20px 6px;
+      font-weight: 700;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 11px;
+      width: 100%; padding: 10px 20px;
+      color: rgba(255,255,255,.5); font-size: 13.5px;
+      font-weight: 400; transition: all var(--trans);
+      border-radius: 0; position: relative; text-align: left;
+    }
+    .nav-btn:hover { color: var(--white); background: rgba(255,255,255,.05); }
+    .nav-btn.active {
+      color: var(--gold); background: rgba(201,169,110,.08);
+      font-weight: 500;
+    }
+    .nav-btn.active::before {
+      content: ''; position: absolute; left: 0; top: 5px; bottom: 5px;
+      width: 3px; background: var(--gold); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-footer {
+      padding: 14px 18px 20px;
+      border-top: 1px solid rgba(255,255,255,.05);
+      display: flex; flex-direction: column; gap: 2px;
+      flex-shrink: 0;
+    }
+    .sidebar-footer-link {
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,.35); font-size: 13px;
+      padding: 9px 2px; transition: color var(--trans);
+      background: none; border: none; cursor: pointer; text-align: left;
+      width: 100%;
+    }
+    .sidebar-footer-link:hover { color: var(--white); }
+    .sidebar-footer-link svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .sidebar-divider { height: 1px; background: rgba(255,255,255,.05); margin: 6px 0; }
+
+    /* ═══════════════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════════════ */
+    #mainContent {
+      margin-left: var(--sidebar-w);
+      flex: 1; display: flex; flex-direction: column; min-height: 100vh;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--topbar-h); background: rgba(251,250,247,.96);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; gap: 16px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .topbar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; color: var(--dark); font-weight: 500;
+    }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: .3px;
+    }
+    .status-badge.ok { background: #e8f5ee; color: var(--ok); }
+    .status-badge.warn { background: #fef6e4; color: var(--warn); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.ok { background: var(--ok); }
+    .status-dot.warn { background: var(--warn); }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-save {
+      display: flex; align-items: center; gap: 7px;
+      padding: 9px 20px; background: var(--dark); color: var(--gold);
+      font-size: 12.5px; font-weight: 700; border-radius: var(--radius-sm);
+      letter-spacing: .5px; transition: all var(--trans);
+    }
+    .btn-save:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+    .btn-save:active { transform: translateY(0); }
+    .btn-save svg { width: 14px; height: 14px; }
+
+    /* ═══════════════════════════════════════════════
+       PANELS
+    ═══════════════════════════════════════════════ */
+    .panel { display: none; padding: 36px 32px 72px; animation: fadeIn .2s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .panel-header { margin-bottom: 28px; }
+    .panel-header h2 { font-size: 32px; color: var(--dark); margin-bottom: 5px; }
+    .panel-header p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    /* CARDS */
+    .card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px; color: var(--dark); font-weight: 500;
+      margin-bottom: 18px; padding-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title-icon { color: var(--gold); font-size: 13px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+
+    /* FORM FIELDS */
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      display: block; font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: #555; margin-bottom: 7px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%; padding: 10px 13px;
+    }
+    .field textarea { resize: vertical; min-height: 90px; line-height: 1.65; }
+    .field input[type="file"] {
+      padding: 9px 12px; background: var(--soft);
+      border-style: dashed; cursor: pointer; font-size: 13px; color: #666;
+    }
+    .field-hint { font-size: 11.5px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+
+    /* RTL fields */
+    .rtl { direction: rtl; text-align: right; font-family: 'Heebo', sans-serif; }
+
+    /* Image preview */
+    .img-preview {
+      margin-top: 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--line); overflow: hidden;
+      background: var(--soft);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .img-preview img { object-fit: contain; width: 100%; }
+    .img-preview.empty {
+      min-height: 120px; color: var(--muted); font-size: 13px;
+      flex-direction: column; gap: 8px;
+    }
+    .img-preview.empty svg { opacity: .35; }
+
+    /* ═══════════════════════════════════════════════
+       DASHBOARD
+    ═══════════════════════════════════════════════ */
+    .stat-card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 22px 24px;
+      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    }
+    .stat-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold2));
+    }
+    .stat-label {
+      font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    }
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px; color: var(--dark); font-weight: 500; line-height: 1;
+    }
+    .stat-delta { font-size: 12px; color: var(--ok); margin-top: 8px; font-weight: 500; }
+    .stat-icon {
+      position: absolute; top: 18px; right: 18px;
+      font-size: 26px; opacity: .1;
+    }
+
+    /* ═══════════════════════════════════════════════
+       LIST ITEMS (treatments, gallery, testimonials)
+    ═══════════════════════════════════════════════ */
+    .list-item {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius); margin-bottom: 12px;
+      overflow: hidden; box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--trans), border-color var(--trans);
+    }
+    .list-item:hover { box-shadow: 0 4px 20px rgba(0,0,0,.09); }
+    .list-item-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; cursor: pointer;
+      border-bottom: 1px solid transparent;
+      transition: background var(--trans), border-color var(--trans);
+      user-select: none;
+    }
+    .list-item-header:hover { background: var(--soft); }
+    .list-item.open .list-item-header {
+      background: var(--soft); border-bottom-color: var(--line);
+    }
+    .list-item-icon {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: var(--soft); border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0; color: var(--gold);
+    }
+    .list-item-info { flex: 1; min-width: 0; }
+    .list-item-name { font-weight: 600; font-size: 14px; color: var(--dark); line-height: 1.3; }
+    .list-item-sub {
+      font-size: 12px; color: var(--muted); margin-top: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .list-item-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+    .list-item-body { padding: 22px 20px; display: none; }
+    .list-item.open .list-item-body { display: block; }
+    .chevron { transition: transform .2s ease; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+    .list-item.open .chevron { transform: rotate(180deg); }
+
+    /* ADD BUTTON */
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border: 1.5px dashed var(--gold);
+      color: var(--gold); border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+      transition: all var(--trans); background: transparent;
+    }
+    .btn-add:hover { background: rgba(201,169,110,.07); border-style: solid; }
+
+    /* DELETE BUTTON */
+    .btn-delete {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 11px; background: #fff5f5; color: #c0392b;
+      border: 1px solid #fecaca; border-radius: var(--radius-sm);
+      font-size: 11.5px; font-weight: 600; transition: all var(--trans);
+    }
+    .btn-delete:hover { background: #fde8e8; border-color: #f87171; }
+
+    /* SMALL UTILITY BUTTONS */
+    .btn-sm {
+      padding: 7px 13px; border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 600; transition: all var(--trans);
+      display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    }
+    .btn-sm.secondary {
+      background: var(--soft); color: #444; border: 1px solid var(--line);
+    }
+    .btn-sm.secondary:hover { background: var(--line); }
+
+    /* STAR RATING */
+    .star-row { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+    .star {
+      font-size: 22px; cursor: pointer; color: #ddd;
+      transition: color .1s ease, transform .1s ease;
+      line-height: 1; user-select: none;
+    }
+    .star.filled { color: #f4a529; }
+    .star:hover { transform: scale(1.18); color: #f4a529; }
+    .stars-label { font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 500; }
+
+    /* PHOTO PAIR */
+    .photo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .photo-slot .slot-label {
+      display: block; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 7px;
+    }
+
+    /* ANALYTICS BADGES */
+    .analytics-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11.5px; font-weight: 600; letter-spacing: .3px;
+      padding: 4px 11px; border-radius: 20px; margin-top: 12px;
+    }
+    .analytics-badge.configured { background: #e8f5ee; color: var(--ok); }
+    .analytics-badge.missing { background: var(--soft); color: var(--muted); }
+
+    /* DASHBOARD TASK LIST */
+    .task-item {
+      display: flex; align-items: flex-start; gap: 11px;
+      padding: 12px 0; border-bottom: 1px solid var(--line);
+      font-size: 13.5px; line-height: 1.45;
+    }
+    .task-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .task-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+    .task-dot.ok { background: var(--ok); }
+    .task-dot.warn { background: #e09f3e; }
+    .task-dot.gold { background: var(--gold); }
+
+    /* QUICK LINKS */
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 10px; }
+    .quick-link {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 10px; background: var(--soft); border: 1px solid var(--line);
+      border-radius: var(--radius); font-size: 12px; font-weight: 600;
+      color: #444; cursor: pointer; transition: all var(--trans); text-align: center;
+    }
+    .quick-link:hover {
+      background: var(--line); color: var(--dark);
+      transform: translateY(-2px); box-shadow: var(--shadow-sm);
+    }
+    .quick-link-icon { font-size: 20px; }
+
+    /* SITE STATUS TABLE */
+    .site-status-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13.5px;
+    }
+    .site-status-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .site-status-label { color: #555; }
+    .site-status-val { font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 5px; }
+    .dot-ok { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+    .dot-warn { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #e09f3e; }
+
+    /* TOGGLE SIDEBAR (mobile) */
+    #sidebarToggle {
+      display: none; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: var(--radius-sm);
+      background: var(--soft); border: 1px solid var(--line);
+      cursor: pointer; flex-shrink: 0;
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,.55);
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════════ */
+    #toast {
+      position: fixed; bottom: 32px; right: 32px; z-index: 9999;
+      background: var(--dark); color: var(--white);
+      padding: 14px 22px; border-radius: var(--radius);
+      font-size: 13.5px; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      display: flex; align-items: center; gap: 10px;
+      transform: translateY(14px) scale(.97); opacity: 0;
+      transition: all .28s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none; max-width: 360px;
+    }
+    #toast.show {
+      transform: translateY(0) scale(1); opacity: 1; pointer-events: auto;
+    }
+    #toast.toast-err { background: #7f1d1d; }
+    #toast.toast-warn { background: #78350f; }
+    .toast-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 960px) {
+      :root { --sidebar-w: 0px; }
+      #sidebar { width: 280px; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      #mainContent { margin-left: 0; }
+      #sidebarToggle { display: flex; }
+      .topbar { padding: 0 20px; }
+      .panel { padding: 24px 20px 56px; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .grid-4, .grid-3 { grid-template-columns: 1fr; }
+      .photo-pair { grid-template-columns: 1fr; }
+      .login-right { width: 100%; padding: 36px 28px; }
+      .login-left { display: none; }
+      #toast { bottom: 20px; right: 16px; left: 16px; max-width: none; }
+      .topbar-title { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand-logo">JB</div>
+      <h1>La Clínica</h1>
+      <p class="login-subtitle">Dr. Jonathan Behar</p>
+      <p class="login-brand-tagline">היכן שמדע פוגש יופי</p>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <h2>Panel de admin</h2>
+      <p class="login-sub">Ingresa tus credenciales para acceder al panel de gestión.</p>
+      <div class="login-error" id="loginError">Usuario o contraseña incorrectos.</div>
+      <form id="loginForm" onsubmit="return doLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Correo electrónico</label>
+          <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <input type="password" id="loginPassword" placeholder="••••••••••" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn-primary">Ingresar al panel</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY (mobile sidebar) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-inner">
+        <div class="sidebar-logo-circle">JB</div>
+        <div class="sidebar-brand-text">
+          <div class="sidebar-brand-name">La Clínica</div>
+          <div class="sidebar-brand-role">Admin Panel</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" role="navigation" aria-label="Panel de navegación">
+      <div class="nav-section-label">General</div>
+      <button class="nav-btn active" onclick="showPanel('dashboard',this)" data-panel="dashboard">
+        <span class="nav-icon">🏠</span>Dashboard
+      </button>
+
+      <div class="nav-section-label">Contenido</div>
+      <button class="nav-btn" onclick="showPanel('hero',this)" data-panel="hero">
+        <span class="nav-icon">🖼</span>Hero &amp; Logo
+      </button>
+      <button class="nav-btn" onclick="showPanel('about',this)" data-panel="about">
+        <span class="nav-icon">👨‍⚕️</span>Sobre nosotros
+      </button>
+      <button class="nav-btn" onclick="showPanel('treatments',this)" data-panel="treatments">
+        <span class="nav-icon">💉</span>Tratamientos
+      </button>
+      <button class="nav-btn" onclick="showPanel('gallery',this)" data-panel="gallery">
+        <span class="nav-icon">📷</span>Galería (antes/después)
+      </button>
+      <button class="nav-btn" onclick="showPanel('testimonials',this)" data-panel="testimonials">
+        <span class="nav-icon">⭐</span>Testimonios
+      </button>
+
+      <div class="nav-section-label">Configuración</div>
+      <button class="nav-btn" onclick="showPanel('contact',this)" data-panel="contact">
+        <span class="nav-icon">📞</span>Contacto &amp; Redes
+      </button>
+      <button class="nav-btn" onclick="showPanel('location',this)" data-panel="location">
+        <span class="nav-icon">📍</span>Ubicación
+      </button>
+      <button class="nav-btn" onclick="showPanel('analytics',this)" data-panel="analytics">
+        <span class="nav-icon">📊</span>Analíticas
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="la-clinica-hebrew.html" target="_blank" class="sidebar-footer-link">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+        Ver sitio
+      </a>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-footer-link" onclick="doLogout()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+        Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button id="sidebarToggle" onclick="toggleSidebar()" aria-label="Abrir menú">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+        </button>
+        <span class="topbar-title" id="topbarTitle">Dashboard</span>
+        <span class="status-badge ok">
+          <span class="status-dot ok"></span>Publicado
+        </span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm secondary" onclick="exportData()" title="Exportar JSON">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Exportar
+        </button>
+        <label class="btn-sm secondary" style="cursor:pointer;" title="Importar JSON">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          Importar
+          <input type="file" accept=".json" style="display:none;" onchange="importData(event)" />
+        </label>
+        <button class="btn-save" onclick="saveData()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859M12 3v8.25m0 0l-3-3m3 3l3-3"/></svg>
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: DASHBOARD
+    ════════════════════════════ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="panel-header">
+        <h2>Dashboard</h2>
+        <p>Resumen general del sitio, accesos rápidos y estado del contenido.</p>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:24px;">
+        <div class="stat-card">
+          <div class="stat-icon">👁</div>
+          <div class="stat-label">Visitas (mes)</div>
+          <div class="stat-value">1,284</div>
+          <div class="stat-delta">↑ +18% vs mes anterior</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-label">Clicks WhatsApp</div>
+          <div class="stat-value">94</div>
+          <div class="stat-delta">↑ +7% esta semana</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">Turnos solicitados</div>
+          <div class="stat-value">37</div>
+          <div class="stat-delta">↑ Buen ritmo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-label">Promedio reseñas</div>
+          <div class="stat-value">5.0</div>
+          <div class="stat-delta" style="color:var(--gold);">★★★★★ Google</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:24px;">
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">✓</span>Tareas recomendadas</div>
+          <div class="task-item">
+            <div class="task-dot gold"></div>
+            <div><strong>Agregar fotos antes/después</strong> — La galería refuerza la confianza de los pacientes.</div>
+          </div>
+          <div class="task-item">
+            <div class="task-dot warn"></div>
+            <div><strong>Configurar Google Analytics</strong> — El ID de GA4 no está configurado aún.</div>
+          </div>
+          <div class="task-item">
+            <div class="task-dot ok"></div>
+            <div>Testimonios activos — <strong id="dash-t-count">3</strong> reseñas cargadas correctamente.</div>
+          </div>
+          <div class="task-item">
+            <div class="task-dot ok"></div>
+            <div>Información de contacto completa — WhatsApp e Instagram activos.</div>
+          </div>
+          <div class="task-item">
+            <div class="task-dot gold"></div>
+            <div><strong>Subir foto del doctor</strong> — Mejora la confianza y el SEO local.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">◎</span>Estado del sitio</div>
+          <div class="site-status-row">
+            <span class="site-status-label">Sitio principal</span>
+            <span class="site-status-val"><span class="dot-ok"></span>Publicado</span>
+          </div>
+          <div class="site-status-row">
+            <span class="site-status-label">Tratamientos activos</span>
+            <span class="site-status-val" id="dash-treatments-count">9</span>
+          </div>
+          <div class="site-status-row">
+            <span class="site-status-label">Casos en galería</span>
+            <span class="site-status-val" id="dash-gallery-count">3</span>
+          </div>
+          <div class="site-status-row">
+            <span class="site-status-label">Testimonios</span>
+            <span class="site-status-val" id="dash-testimonials-count">3</span>
+          </div>
+          <div class="site-status-row">
+            <span class="site-status-label">Google Analytics</span>
+            <span class="site-status-val" id="dash-ga-status"><span class="dot-warn"></span>Sin configurar</span>
+          </div>
+          <div class="site-status-row">
+            <span class="site-status-label">Meta Pixel</span>
+            <span class="site-status-val" id="dash-meta-status"><span class="dot-warn"></span>Sin configurar</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">⚡</span>Accesos rápidos</div>
+        <div class="quick-links">
+          <div class="quick-link" onclick="showPanel('hero',null)"><div class="quick-link-icon">🖼</div>Hero &amp; Logo</div>
+          <div class="quick-link" onclick="showPanel('about',null)"><div class="quick-link-icon">👨‍⚕️</div>Sobre nosotros</div>
+          <div class="quick-link" onclick="showPanel('treatments',null)"><div class="quick-link-icon">💉</div>Tratamientos</div>
+          <div class="quick-link" onclick="showPanel('gallery',null)"><div class="quick-link-icon">📷</div>Galería</div>
+          <div class="quick-link" onclick="showPanel('testimonials',null)"><div class="quick-link-icon">⭐</div>Testimonios</div>
+          <div class="quick-link" onclick="showPanel('contact',null)"><div class="quick-link-icon">📞</div>Contacto</div>
+          <div class="quick-link" onclick="showPanel('location',null)"><div class="quick-link-icon">📍</div>Ubicación</div>
+          <div class="quick-link" onclick="showPanel('analytics',null)"><div class="quick-link-icon">📊</div>Analíticas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: HERO & LOGO
+    ════════════════════════════ -->
+    <div class="panel" id="panel-hero">
+      <div class="panel-header">
+        <h2>Hero &amp; Logo</h2>
+        <p>Eslogan principal del sitio y logotipo de la clínica.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">✦</span>Tagline del Hero</div>
+          <div class="field">
+            <label>Eslogan principal (hebreo)</label>
+            <input type="text" class="rtl" id="hero-tagline" placeholder="היכן שמדע פוגש יופי" />
+            <div class="field-hint">Texto principal en grande sobre la imagen del hero. Aparece en la portada del sitio.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">◎</span>Logotipo del sitio</div>
+          <div class="field">
+            <label>Subir logotipo</label>
+            <input type="file" accept="image/*" onchange="uploadImage(event,'logoSrc','preview-logo')" />
+            <div class="field-hint">PNG con fondo transparente recomendado. Se guarda como base64 en localStorage.</div>
+          </div>
+          <div class="img-preview empty" id="preview-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M13.5 12h.008v.008H13.5V12zm-4.5 2.25h.008v.008H9v-.008zM6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0017.25 4.5H6.75A2.25 2.25 0 004.5 6.75v10.5A2.25 2.25 0 006.75 19.5z"/></svg>
+            <span>Sin logo cargado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: SOBRE NOSOTROS
+    ════════════════════════════ -->
+    <div class="panel" id="panel-about">
+      <div class="panel-header">
+        <h2>Sobre nosotros</h2>
+        <p>Información del doctor: nombre, especialidad, biografía y foto.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">✦</span>Datos del doctor</div>
+          <div class="field">
+            <label>Nombre completo (hebreo)</label>
+            <input type="text" class="rtl" id="about-name" />
+          </div>
+          <div class="field">
+            <label>Especialidad / Rol (hebreo)</label>
+            <input type="text" class="rtl" id="about-role" />
+          </div>
+          <div class="field">
+            <label>Biografía (hebreo)</label>
+            <textarea class="rtl" id="about-bio" style="min-height:150px;"></textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">◎</span>Foto del doctor</div>
+          <div class="field">
+            <label>Subir fotografía</label>
+            <input type="file" accept="image/*" onchange="uploadImage(event,'doctorPhoto','preview-doctor')" />
+            <div class="field-hint">JPG o PNG. La imagen se guarda como base64 y se muestra en la sección del doctor.</div>
+          </div>
+          <div class="img-preview empty" id="preview-doctor">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            <span>Sin foto cargada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: TRATAMIENTOS
+    ════════════════════════════ -->
+    <div class="panel" id="panel-treatments">
+      <div class="panel-header">
+        <h2>Tratamientos</h2>
+        <p>Lista de servicios ofrecidos por la clínica. Haz click en cada ítem para editar sus campos.</p>
+      </div>
+      <div id="treatments-list"></div>
+      <button class="btn-add" style="margin-top:8px;" onclick="addTreatment()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        Agregar tratamiento
+      </button>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: GALERÍA
+    ════════════════════════════ -->
+    <div class="panel" id="panel-gallery">
+      <div class="panel-header">
+        <h2>Galería — Antes y Después</h2>
+        <p>Casos clínicos con fotos de antes y después. Haz click en cada caso para subir imágenes.</p>
+      </div>
+      <div id="gallery-list"></div>
+      <button class="btn-add" style="margin-top:8px;" onclick="addCase()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        Agregar caso
+      </button>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: TESTIMONIOS
+    ════════════════════════════ -->
+    <div class="panel" id="panel-testimonials">
+      <div class="panel-header">
+        <h2>Testimonios — חוות דעת</h2>
+        <p>Reseñas de pacientes que aparecen en el sitio. Edita nombre, texto, rol y puntuación de cada una.</p>
+      </div>
+      <div id="testimonials-list"></div>
+      <button class="btn-add" style="margin-top:8px;" onclick="addTestimonial()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        Agregar testimonio
+      </button>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: CONTACTO
+    ════════════════════════════ -->
+    <div class="panel" id="panel-contact">
+      <div class="panel-header">
+        <h2>Contacto &amp; Redes Sociales</h2>
+        <p>Datos de contacto y links a redes sociales que aparecen en el sitio.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">📞</span>Datos de contacto</div>
+          <div class="field">
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="contact-phone" placeholder="+972532452995" />
+            <div class="field-hint">Incluir código de país. Ej: +972532452995</div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="contact-email" placeholder="info@laclinica.co.il" />
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">✦</span>Redes Sociales</div>
+          <div class="field">
+            <label>Instagram (URL completa)</label>
+            <input type="url" id="contact-instagram" placeholder="https://www.instagram.com/..." />
+          </div>
+          <div class="field">
+            <label>Facebook (URL completa)</label>
+            <input type="url" id="contact-facebook" placeholder="https://www.facebook.com/..." />
+          </div>
+          <div class="field">
+            <label>TikTok (URL completa)</label>
+            <input type="url" id="contact-tiktok" placeholder="https://www.tiktok.com/@..." />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: UBICACIÓN
+    ════════════════════════════ -->
+    <div class="panel" id="panel-location">
+      <div class="panel-header">
+        <h2>Ubicación</h2>
+        <p>Información de la dirección de la clínica y enlace a Google Maps.</p>
+      </div>
+      <div class="card" style="max-width:640px;">
+        <div class="card-title"><span class="card-title-icon">📍</span>Datos de ubicación</div>
+        <div class="field">
+          <label>Título / Nombre del lugar (hebreo)</label>
+          <input type="text" class="rtl" id="location-title" />
+        </div>
+        <div class="field">
+          <label>Descripción de la ubicación (hebreo)</label>
+          <textarea class="rtl" id="location-desc" style="min-height:110px;"></textarea>
+        </div>
+        <div class="field">
+          <label>Consulta para Google Maps</label>
+          <input type="text" id="location-maps" placeholder="Touch Clinic Nahariya Israel" />
+          <div class="field-hint">Esta cadena abre Google Maps al hacer click en el enlace del sitio.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL: ANALÍTICAS
+    ════════════════════════════ -->
+    <div class="panel" id="panel-analytics">
+      <div class="panel-header">
+        <h2>Analíticas &amp; Píxeles</h2>
+        <p>IDs de seguimiento para Google Analytics, Meta Pixel y TikTok Pixel.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">📊</span>Google Analytics 4</div>
+          <div class="field">
+            <label>Measurement ID (GA4)</label>
+            <input type="text" id="analytics-ga4" placeholder="G-XXXXXXXXXX"
+              oninput="data.analytics.ga4Id=this.value;updateAnalyticsBadges();updateDashboardStats()" />
+            <div class="field-hint">Formato: G-XXXXXXXXXX</div>
+          </div>
+          <div id="ga4-badge"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">◈</span>Meta (Facebook) Pixel</div>
+          <div class="field">
+            <label>Pixel ID</label>
+            <input type="text" id="analytics-meta" placeholder="123456789012345"
+              oninput="data.analytics.metaPixelId=this.value;updateAnalyticsBadges();updateDashboardStats()" />
+            <div class="field-hint">Solo el número de ID sin texto adicional.</div>
+          </div>
+          <div id="meta-badge"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">◑</span>TikTok Pixel</div>
+          <div class="field">
+            <label>Pixel ID</label>
+            <input type="text" id="analytics-tiktok" placeholder="CXXXXXXXXXXXXXXXXX"
+              oninput="data.analytics.tiktokPixelId=this.value;updateAnalyticsBadges();updateDashboardStats()" />
+            <div class="field-hint">El ID del píxel de TikTok Ads Manager.</div>
+          </div>
+          <div id="tiktok-badge"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mainContent -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div id="toast" role="status" aria-live="polite">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-msg">Cambios guardados correctamente</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ─── DEFAULT DATA ─── */
+const DEFAULTS = {
+  schemaVersion: 3,
+  hero: { tagline: 'היכן שמדע פוגש יופי' },
+  about: {
+    name: 'ד"ר יונתן בהר גרינפלד',
+    role: 'מומחה לרפואה אסתטית',
+    bio: 'רופא רפואה אסתטית מנוסה הפועל ב-Touch Clinic, נהריה, ישראל. מחויב לתוצאות טבעיות והרמוניות תוך שימוש בטכניקות המתקדמות ביותר שאינן כירורגיות.'
+  },
+  contact: {
+    phone: '+972532452995', email: '',
+    instagram: 'https://www.instagram.com/dr.jonathanbehar/',
+    facebook: '', tiktok: ''
+  },
+  location: {
+    title: 'Touch Clinic, נהריה',
+    description: 'הקליניקה נמצאת בנהריה, ישראל. ניתן לפתוח ניווט ישיר במפות.',
+    mapsQuery: 'Touch Clinic Nahariya Israel'
+  },
+  images: {
+    doctorPhoto: 'assets/doctor-photo.jpg',
+    logoSrc: 'assets/logo-jb-transparent.png'
+  },
+  cases: [
+    { label: 'ריינומודלינג', before: '', after: '' },
+    { label: 'PRP קפילרי', before: '', after: '' },
+    { label: 'הרמוניזציה', before: '', after: '' }
+  ],
+  testimonials: [
+    { text: 'ד"ר בהר הוא מקצוען אמיתי. תוצאות ה-PRP עלו על כל ציפיותיי — הפנים שלי נראות רעננות וטבעיות לחלוטין.', name: 'מיכל ל.', role: 'ריינומודלינג · נהריה', stars: 5 },
+    { text: 'ניגשתי לטיפול בחשש, אבל ד"ר בהר הסביר כל שלב בסבלנות. הבוטוקס יצא מדויק ומקצועי — ממליצה בחום!', name: 'שירה מ.', role: 'נוירומודולטור · חיפה', stars: 5 },
+    { text: 'הרמוניזציה הפנים שינתה את ההרגשה שלי לגמרי. כולם שואלים מה עשיתי, אבל נראה הכי טבעי שיש.', name: 'דניאל ק.', role: 'הרמוניזציה · עכו', stars: 5 },
+    { text: 'עשיתי Skin Booster עם ד"ר בהר לפני החתונה שלי ולא יכולתי להיות מרוצה יותר. העור שלי זהר, כולם שאלו מה הסוד שלי. מקצוענות ברמה אחרת!', name: 'נועה ש.', role: 'Skin Booster · כרמיאל', stars: 5 },
+    { text: 'עשיתי אצל ד"ר בהר טיפול PRP לשיער אחרי שסבלתי מנשירה כבר שנים. אחרי 3 חודשים ראיתי תוצאות ממשיות — שיער חדש ועבה יותר. ממליץ בחום לכל מי שמתמודד עם הנושא.', name: 'אלון ר.', role: 'PRP שיער · עכו', stars: 5 },
+    { text: 'עשיתי ריינומודלינג ותמיד חשבתי שזה ייראה מלאכותי, אבל ד"ר בהר עשה עבודה מדהימה — האף שלי נראה טוב יותר, סימטרי ומאוזן, בלי שום "מלאכותיות". הייעוץ לפני הטיפול היה מפורט ומרגיע מאד.', name: 'רונית א.', role: 'ריינומודלינג · נהריה', stars: 5 },
+    { text: 'טיפול ב-ojeras (שקעי עיניים) שלי שינה לגמרי את המראה שלי — נראית נוחה וצעירה יותר. ד"ר בהר הסביר הכל בסבלנות, עבד בדיוק ובמהירות. תוצאה מושלמת.', name: 'יעל ג.', role: 'טיפול תחת העיניים · חיפה', stars: 5 },
+    { text: 'El Dr. Behar es increíblemente profesional. Vine desde Buenos Aires recomendada por una amiga y valió cada kilómetro. El tratamiento de rellenos fue exactamente lo que buscaba: natural, armonioso, sin exageraciones. Volvería sin dudarlo.', name: 'Valentina M.', role: 'הרמוניזציה · Buenos Aires', stars: 5 },
+    { text: 'Llevo dos años visitando al Dr. Behar para mantenimiento con botox y siempre quedo encantada. Tiene una mano muy fina, entiende perfectamente lo que quiero sin que tenga que explicarle demasiado. 100% recomendado.', name: 'Laura S.', role: 'נוירומודולטור · Madrid', stars: 5 }
+  ],
+  treatments: [
+    { ico: '◈', name: 'נוירומודולטור (בוטוקס)', sub: 'החלקת קמטים', desc: 'החלקת קווי הבעה עם מיקרו-זריקות מדויקות לתוצאות טבעיות ורעננות.' },
+    { ico: '✦', name: 'PRP – פלסמה עשירת טסיות', sub: 'שיקום עור ושיער', desc: 'ניצול כוח ההתחדשות הטבעי של הגוף לעור ולשיער.' },
+    { ico: '◇', name: 'הרמוניזציה של הפנים', sub: 'פנים מלאות', desc: 'איזון מחדש של הפנים כולן בשימוש בטכניקות מתקדמות של ממלאים.' },
+    { ico: '◎', name: 'Skin Booster – Spanish Glow', sub: 'לחות ובהירות', desc: 'פרוטוקול לחות ובהירות עמוקה עם RRS HA Long Lasting.' },
+    { ico: '○', name: 'סקלרוזה ורידית', sub: 'ורידים', desc: 'טיפול בטוח ויעיל בוורידים לא רצויים, ללא כאב וללא השבתה.' },
+    { ico: '◑', name: 'ריינומודלינג', sub: 'עיצוב אף', desc: 'עיצוב ועידון האף ללא ניתוח בשימוש בטכניקת ממלאים מתקדמת.' },
+    { ico: '✿', name: 'טיפול PRP בשיער', sub: 'גדילת שיער', desc: 'גירוי גדילת שיער טבעית לגברים ולנשים.' },
+    { ico: '◐', name: 'טיפול תחת העיניים', sub: 'פריאורביטלי', desc: 'הפחתת עיגולים כהים, שקעים ונפיחות סביב העיניים.' },
+    { ico: '◉', name: 'הגדלת שפתיים', sub: 'עיצוב שפתיים', desc: 'הגדלת שפתיים טבעית ומידתית עם ממלאי חומצה היאלורונית.' }
+  ],
+  analytics: { ga4Id: '', metaPixelId: '', tiktokPixelId: '' }
+};
+
+/* ─── STATE ─── */
+const LS_KEY = 'clinicAdminContentV1';
+let data = {};
+
+/* ─── DEEP MERGE ─── */
+function deepMergeDefaults(target, defaults) {
+  for (const key of Object.keys(defaults)) {
+    if (!(key in target)) {
+      target[key] = JSON.parse(JSON.stringify(defaults[key]));
+    } else if (
+      typeof defaults[key] === 'object' &&
+      !Array.isArray(defaults[key]) &&
+      defaults[key] !== null &&
+      typeof target[key] === 'object' &&
+      !Array.isArray(target[key])
+    ) {
+      deepMergeDefaults(target[key], defaults[key]);
+    }
+  }
+}
+
+/* ─── LOAD DATA ─── */
+function loadData() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      data = JSON.parse(raw);
+      deepMergeDefaults(data, DEFAULTS);
+    } else {
+      data = JSON.parse(JSON.stringify(DEFAULTS));
+    }
+  } catch (e) {
+    data = JSON.parse(JSON.stringify(DEFAULTS));
+  }
+}
+
+/* ─── COLLECT FORM DATA ─── */
+function collectFormData() {
+  data.hero.tagline            = fieldVal('hero-tagline');
+  data.about.name              = fieldVal('about-name');
+  data.about.role              = fieldVal('about-role');
+  data.about.bio               = fieldVal('about-bio');
+  data.contact.phone           = fieldVal('contact-phone');
+  data.contact.email           = fieldVal('contact-email');
+  data.contact.instagram       = fieldVal('contact-instagram');
+  data.contact.facebook        = fieldVal('contact-facebook');
+  data.contact.tiktok          = fieldVal('contact-tiktok');
+  data.location.title          = fieldVal('location-title');
+  data.location.description    = fieldVal('location-desc');
+  data.location.mapsQuery      = fieldVal('location-maps');
+  data.analytics.ga4Id         = fieldVal('analytics-ga4');
+  data.analytics.metaPixelId   = fieldVal('analytics-meta');
+  data.analytics.tiktokPixelId = fieldVal('analytics-tiktok');
+  // Dynamic lists are already bound via oninput
+}
+
+/* ─── SAVE DATA ─── */
+function saveData() {
+  collectFormData();
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  } catch (e) {
+    showToast('Error al guardar: almacenamiento lleno', 'err');
+    return;
+  }
+  updateAnalyticsBadges();
+  updateDashboardStats();
+  showToast('Cambios guardados correctamente ✓');
+
+  if (window._fbDb) {
+    window._fbDb.collection('site').doc('main')
+      .set({ content: data, updatedAt: new Date().toISOString() })
+      .catch(e => console.warn('Firebase sync error:', e.message));
+  }
+}
+
+/* ─── HELPERS ─── */
+function fieldVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+function setField(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val || '';
+}
+function setInnerHTML(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ─── LOGIN ─── */
+function doLogin(e) {
+  e.preventDefault();
+  const email  = document.getElementById('loginEmail').value.trim();
+  const pass   = document.getElementById('loginPassword').value;
+  const errEl  = document.getElementById('loginError');
+  const btn    = e.target.querySelector('button[type="submit"]');
+
+  errEl.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = 'Ingresando…'; }
+
+  if (!window._fbAuth) {
+    errEl.textContent = 'Firebase no disponible. Recargá la página.';
+    errEl.style.display = 'block';
+    if (btn) { btn.disabled = false; btn.textContent = 'Ingresar al panel'; }
+    return false;
+  }
+
+  window._fbAuth.signInWithEmailAndPassword(email, pass)
+    .then(() => {
+      if (btn) { btn.disabled = false; btn.textContent = 'Ingresar al panel'; }
+    })
+    .catch(err => {
+      const msgs = {
+        'auth/invalid-email':      'Email inválido.',
+        'auth/user-not-found':     'Usuario no encontrado.',
+        'auth/wrong-password':     'Contraseña incorrecta.',
+        'auth/invalid-credential': 'Email o contraseña incorrectos.',
+        'auth/too-many-requests':  'Demasiados intentos. Esperá unos minutos.'
+      };
+      errEl.textContent = msgs[err.code] || 'Error al ingresar. Intentá de nuevo.';
+      errEl.style.display = 'block';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+      if (btn) { btn.disabled = false; btn.textContent = 'Ingresar al panel'; }
+    });
+
+  return false;
+}
+
+function doLogout() {
+  if (window._fbAuth) window._fbAuth.signOut();
+}
+
+/* ─── INIT APP ─── */
+function initApp() {
+  loadData();
+  populateForms();
+  renderTreatments();
+  renderGallery();
+  renderTestimonials();
+  updateAnalyticsBadges();
+  updateDashboardStats();
+}
+
+function populateForms() {
+  setField('hero-tagline',        data.hero.tagline);
+  setField('about-name',          data.about.name);
+  setField('about-role',          data.about.role);
+  setField('about-bio',           data.about.bio);
+  setField('contact-phone',       data.contact.phone);
+  setField('contact-email',       data.contact.email);
+  setField('contact-instagram',   data.contact.instagram);
+  setField('contact-facebook',    data.contact.facebook);
+  setField('contact-tiktok',      data.contact.tiktok);
+  setField('location-title',      data.location.title);
+  setField('location-desc',       data.location.description);
+  setField('location-maps',       data.location.mapsQuery);
+  setField('analytics-ga4',       data.analytics.ga4Id);
+  setField('analytics-meta',      data.analytics.metaPixelId);
+  setField('analytics-tiktok',    data.analytics.tiktokPixelId);
+
+  // Image previews
+  if (data.images.logoSrc)    setImgPreview('preview-logo',   data.images.logoSrc);
+  if (data.images.doctorPhoto) setImgPreview('preview-doctor', data.images.doctorPhoto);
+}
+
+/* ─── PANEL NAVIGATION ─── */
+const PANEL_TITLES = {
+  dashboard:    'Dashboard',
+  hero:         'Hero & Logo',
+  about:        'Sobre nosotros',
+  treatments:   'Tratamientos',
+  gallery:      'Galería',
+  testimonials: 'Testimonios',
+  contact:      'Contacto & Redes',
+  location:     'Ubicación',
+  analytics:    'Analíticas'
+};
+
+function showPanel(panelId, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  const panel = document.getElementById('panel-' + panelId);
+  if (panel) panel.classList.add('active');
+
+  const titleEl = document.getElementById('topbarTitle');
+  if (titleEl) titleEl.textContent = PANEL_TITLES[panelId] || panelId;
+
+  const navBtn = btn || document.querySelector(`.nav-btn[data-panel="${panelId}"]`);
+  if (navBtn) navBtn.classList.add('active');
+
+  closeSidebar();
+}
+
+/* ─── SIDEBAR MOBILE ─── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+/* ─── TOAST ─── */
+let toastTimer = null;
+function showToast(msg, type) {
+  const el    = document.getElementById('toast');
+  const msgEl = document.getElementById('toast-msg');
+  const icnEl = document.getElementById('toast-icon');
+  el.className = 'show' + (type ? ' toast-' + type : '');
+  msgEl.textContent = msg;
+  icnEl.textContent = type === 'err' ? '✕' : '✓';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+/* ─── IMAGE UPLOAD ─── */
+async function uploadImage(event, key, previewId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Imagen demasiado grande (máx. 5MB)', 'err');
+    return;
+  }
+
+  // Firebase Storage upload
+  if (window._fbStorage) {
+    showToast('Subiendo imagen…');
+    try {
+      const ext = file.name.split('.').pop();
+      const ref = window._fbStorage.ref(`clinic-images/${key}-${Date.now()}.${ext}`);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      data.images[key] = url;
+      setImgPreview(previewId, url);
+      showToast('Imagen subida a Firebase ✓');
+      return;
+    } catch (e) {
+      console.warn('Firebase Storage error:', e.message);
+      showToast('Error al subir — usando almacenamiento local', 'err');
+    }
+  }
+
+  // Fallback: base64 local
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    data.images[key] = e.target.result;
+    setImgPreview(previewId, e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function setImgPreview(containerId, src) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.className = 'img-preview';
+  c.innerHTML = `<img src="${escHtml(src)}" alt="Preview" style="max-height:220px;width:100%;object-fit:contain;" />`;
+}
+
+/* ══════════════════════════════════════════════
+   TREATMENTS
+══════════════════════════════════════════════ */
+function renderTreatments() {
+  const container = document.getElementById('treatments-list');
+  container.innerHTML = '';
+  (data.treatments || []).forEach((t, i) => {
+    container.appendChild(makeTreatmentItem(t, i));
+  });
+}
+
+function makeTreatmentItem(t, i) {
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.id = `tr-item-${i}`;
+  div.innerHTML = `
+    <div class="list-item-header" onclick="toggleItem('tr-item-${i}')">
+      <div class="list-item-icon" id="tr-ico-${i}">${escHtml(t.ico || '◈')}</div>
+      <div class="list-item-info">
+        <div class="list-item-name rtl" id="tr-name-${i}">${escHtml(t.name)}</div>
+        <div class="list-item-sub rtl" id="tr-sub-${i}">${escHtml(t.sub)}</div>
+      </div>
+      <div class="list-item-actions" onclick="event.stopPropagation()">
+        <button class="btn-delete" onclick="deleteTreatment(${i})" aria-label="Eliminar tratamiento">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+          Eliminar
+        </button>
+      </div>
+      <span class="chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="list-item-body">
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:14px;margin-bottom:16px;">
+        <div class="field" style="margin:0;">
+          <label>Ícono</label>
+          <input type="text" value="${escHtml(t.ico)}"
+            oninput="data.treatments[${i}].ico=this.value;syncEl('tr-ico-${i}',this.value)"
+            style="text-align:center;font-size:20px;" />
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Sub-título (hebreo)</label>
+          <input type="text" class="rtl" value="${escHtml(t.sub)}"
+            oninput="data.treatments[${i}].sub=this.value;syncEl('tr-sub-${i}',this.value)" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Nombre del tratamiento (hebreo)</label>
+        <input type="text" class="rtl" value="${escHtml(t.name)}"
+          oninput="data.treatments[${i}].name=this.value;syncEl('tr-name-${i}',this.value)" />
+      </div>
+      <div class="field">
+        <label>Descripción (hebreo)</label>
+        <textarea class="rtl" style="min-height:90px;"
+          oninput="data.treatments[${i}].desc=this.value">${escHtml(t.desc)}</textarea>
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+function addTreatment() {
+  data.treatments.push({ ico: '◈', name: 'טיפול חדש', sub: 'תת-כותרת', desc: '' });
+  renderTreatments();
+  openLastItem('treatments-list');
+  updateDashboardStats();
+}
+
+function deleteTreatment(i) {
+  if (!confirm('¿Eliminar este tratamiento?')) return;
+  data.treatments.splice(i, 1);
+  renderTreatments();
+  updateDashboardStats();
+}
+
+/* ══════════════════════════════════════════════
+   GALLERY
+══════════════════════════════════════════════ */
+function renderGallery() {
+  const container = document.getElementById('gallery-list');
+  container.innerHTML = '';
+  (data.cases || []).forEach((c, i) => {
+    container.appendChild(makeGalleryItem(c, i));
+  });
+}
+
+function makeGalleryItem(c, i) {
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.id = `gl-item-${i}`;
+
+  const hasBefore = !!(c.before && c.before.trim());
+  const hasAfter  = !!(c.after  && c.after.trim());
+  const subText = `${hasBefore ? 'Antes: ✓' : 'Antes: —'}  ·  ${hasAfter ? 'Después: ✓' : 'Después: —'}`;
+
+  const beforeSlot = makePhotoSlotHTML(c.before, i, 'before', `gl-before-${i}`, 'ANTES');
+  const afterSlot  = makePhotoSlotHTML(c.after,  i, 'after',  `gl-after-${i}`,  'DESPUÉS');
+
+  div.innerHTML = `
+    <div class="list-item-header" onclick="toggleItem('gl-item-${i}')">
+      <div class="list-item-icon">📷</div>
+      <div class="list-item-info">
+        <div class="list-item-name rtl" id="gl-label-${i}">${escHtml(c.label)}</div>
+        <div class="list-item-sub" id="gl-sub-${i}">${subText}</div>
+      </div>
+      <div class="list-item-actions" onclick="event.stopPropagation()">
+        <button class="btn-delete" onclick="deleteCase(${i})" aria-label="Eliminar caso">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+          Eliminar
+        </button>
+      </div>
+      <span class="chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="list-item-body">
+      <div class="field" style="margin-bottom:18px;">
+        <label>Etiqueta del caso (hebreo)</label>
+        <input type="text" class="rtl" value="${escHtml(c.label)}"
+          oninput="data.cases[${i}].label=this.value;syncEl('gl-label-${i}',this.value)" />
+      </div>
+      <div class="photo-pair">
+        ${beforeSlot}
+        ${afterSlot}
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+function makePhotoSlotHTML(src, caseIdx, field, previewId, labelText) {
+  const hasSrc = !!(src && src.trim());
+  const imgContent = hasSrc
+    ? `<img src="${escHtml(src)}" alt="${labelText}" style="width:100%;height:150px;object-fit:cover;" />`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M13.5 12h.008v.008H13.5V12zm-4.5 2.25h.008v.008H9v-.008zM6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0017.25 4.5H6.75A2.25 2.25 0 004.5 6.75v10.5A2.25 2.25 0 006.75 19.5z"/></svg><span>Sin foto</span>`;
+
+  return `
+    <div class="photo-slot">
+      <span class="slot-label">Foto ${labelText}</span>
+      <input type="file" accept="image/*"
+        onchange="uploadGalleryPhoto(event,${caseIdx},'${field}','${previewId}')"
+        style="width:100%;padding:8px 12px;background:var(--soft);border:1.5px dashed var(--line);border-radius:6px;font-size:12px;color:#666;cursor:pointer;margin-bottom:0;" />
+      <div class="img-preview ${hasSrc ? '' : 'empty'}" id="${previewId}" style="margin-top:10px;min-height:150px;">
+        ${imgContent}
+      </div>
+    </div>
+  `;
+}
+
+function uploadGalleryPhoto(event, caseIndex, field, previewId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Imagen demasiado grande (máx. 5MB)', 'err');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    data.cases[caseIndex][field] = e.target.result;
+    const container = document.getElementById(previewId);
+    if (container) {
+      container.className = 'img-preview';
+      container.style.minHeight = '150px';
+      container.innerHTML = `<img src="${escHtml(e.target.result)}" alt="${field}" style="width:100%;height:150px;object-fit:cover;" />`;
+    }
+    // Update header sub
+    const c = data.cases[caseIndex];
+    const subEl = document.getElementById(`gl-sub-${caseIndex}`);
+    if (subEl) {
+      subEl.textContent = `${c.before ? 'Antes: ✓' : 'Antes: —'}  ·  ${c.after ? 'Después: ✓' : 'Después: —'}`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function addCase() {
+  data.cases.push({ label: 'מקרה חדש', before: '', after: '' });
+  renderGallery();
+  openLastItem('gallery-list');
+  updateDashboardStats();
+}
+
+function deleteCase(i) {
+  if (!confirm('¿Eliminar este caso de la galería?')) return;
+  data.cases.splice(i, 1);
+  renderGallery();
+  updateDashboardStats();
+}
+
+/* ══════════════════════════════════════════════
+   TESTIMONIALS
+══════════════════════════════════════════════ */
+function renderTestimonials() {
+  const container = document.getElementById('testimonials-list');
+  container.innerHTML = '';
+  (data.testimonials || []).forEach((t, i) => {
+    container.appendChild(makeTestimonialItem(t, i));
+  });
+}
+
+function makeTestimonialItem(t, i) {
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.id = `ts-item-${i}`;
+
+  const stars   = t.stars || 5;
+  const nameStr = escHtml(t.name);
+  const roleStr = escHtml(t.role);
+  const textStr = escHtml(t.text);
+  const preview = (t.text || '').substring(0, 65) + ((t.text || '').length > 65 ? '…' : '');
+  const starsHeaderStr = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+
+  const starsHTML = [1,2,3,4,5].map(s => `
+    <span class="star ${stars >= s ? 'filled' : ''}" data-ts="${i}" data-val="${s}"
+      onclick="setStars(${i},${s})"
+      onmouseenter="previewStars(${i},${s})"
+      onmouseleave="restoreStars(${i})">★</span>
+  `).join('');
+
+  div.innerHTML = `
+    <div class="list-item-header" onclick="toggleItem('ts-item-${i}')">
+      <div class="list-item-icon" style="font-size:20px;color:#f4a529;">★</div>
+      <div class="list-item-info">
+        <div class="list-item-name" id="ts-name-${i}">
+          ${nameStr} <span style="color:var(--muted);font-weight:400;font-size:12px;">— ${roleStr}</span>
+        </div>
+        <div class="list-item-sub rtl" id="ts-preview-${i}">${escHtml(preview)}</div>
+      </div>
+      <div class="list-item-actions" onclick="event.stopPropagation()">
+        <span id="ts-hstars-${i}" style="color:#f4a529;font-size:14px;letter-spacing:1px;">${starsHeaderStr}</span>
+        <button class="btn-delete" onclick="deleteTestimonial(${i})" aria-label="Eliminar testimonio">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+          Eliminar
+        </button>
+      </div>
+      <span class="chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="list-item-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div class="field" style="margin:0;">
+          <label>Nombre del paciente</label>
+          <input type="text" value="${nameStr}"
+            oninput="data.testimonials[${i}].name=this.value;updateTestimonialHeader(${i})"
+            placeholder="מיכל ל." />
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Rol / Tratamiento (hebreo)</label>
+          <input type="text" class="rtl" value="${roleStr}"
+            oninput="data.testimonials[${i}].role=this.value;updateTestimonialHeader(${i})"
+            placeholder="ריינומודלינג · נהריה" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Texto de la reseña (hebreo)</label>
+        <textarea class="rtl" style="min-height:100px;"
+          oninput="data.testimonials[${i}].text=this.value;updateTestimonialPreview(${i},this.value)"
+          placeholder="כתוב את חוות הדעת כאן...">${textStr}</textarea>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Puntuación</label>
+        <div class="star-row" id="ts-stars-${i}" role="group" aria-label="Puntuación de ${stars} estrellas">
+          ${starsHTML}
+          <span class="stars-label" id="ts-slabel-${i}">${stars} / 5</span>
+        </div>
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+function setStars(i, val) {
+  data.testimonials[i].stars = val;
+  // Update star row
+  const row = document.getElementById(`ts-stars-${i}`);
+  if (row) {
+    row.querySelectorAll('.star').forEach((s, idx) => {
+      s.classList.toggle('filled', idx < val);
+    });
+  }
+  // Update label
+  const label = document.getElementById(`ts-slabel-${i}`);
+  if (label) label.textContent = `${val} / 5`;
+  // Update header
+  const hstars = document.getElementById(`ts-hstars-${i}`);
+  if (hstars) hstars.textContent = '★'.repeat(val) + '☆'.repeat(5 - val);
+}
+
+function previewStars(i, val) {
+  const row = document.getElementById(`ts-stars-${i}`);
+  if (row) {
+    row.querySelectorAll('.star').forEach((s, idx) => {
+      s.classList.toggle('filled', idx < val);
+    });
+  }
+}
+
+function restoreStars(i) {
+  const val = data.testimonials[i] ? (data.testimonials[i].stars || 5) : 5;
+  const row = document.getElementById(`ts-stars-${i}`);
+  if (row) {
+    row.querySelectorAll('.star').forEach((s, idx) => {
+      s.classList.toggle('filled', idx < val);
+    });
+  }
+}
+
+function updateTestimonialHeader(i) {
+  const t = data.testimonials[i];
+  if (!t) return;
+  const nameEl = document.getElementById(`ts-name-${i}`);
+  if (nameEl) {
+    nameEl.innerHTML = `${escHtml(t.name)} <span style="color:var(--muted);font-weight:400;font-size:12px;">— ${escHtml(t.role)}</span>`;
+  }
+}
+
+function updateTestimonialPreview(i, text) {
+  const sub = document.getElementById(`ts-preview-${i}`);
+  if (sub) {
+    const preview = (text || '').substring(0, 65) + ((text || '').length > 65 ? '…' : '');
+    sub.textContent = preview;
+  }
+}
+
+function addTestimonial() {
+  data.testimonials.push({ text: '', name: 'שם המטופל', role: 'טיפול · עיר', stars: 5 });
+  renderTestimonials();
+  openLastItem('testimonials-list');
+  updateDashboardStats();
+  // Focus the name input of the new item
+  const items = document.querySelectorAll('#testimonials-list .list-item');
+  const last = items[items.length - 1];
+  if (last) {
+    const nameInput = last.querySelector('.list-item-body input[type="text"]');
+    if (nameInput) setTimeout(() => { nameInput.focus(); nameInput.select(); }, 120);
+  }
+}
+
+function deleteTestimonial(i) {
+  if (!confirm('¿Eliminar este testimonio?')) return;
+  data.testimonials.splice(i, 1);
+  renderTestimonials();
+  updateDashboardStats();
+}
+
+/* ─── TOGGLE LIST ITEM EXPAND ─── */
+function toggleItem(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+function openLastItem(listId) {
+  const items = document.querySelectorAll(`#${listId} .list-item`);
+  const last = items[items.length - 1];
+  if (last) {
+    last.classList.add('open');
+    setTimeout(() => last.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+  }
+}
+
+/* ─── SYNC ELEMENT TEXT ─── */
+function syncEl(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+/* ─── ANALYTICS BADGES ─── */
+function updateAnalyticsBadges() {
+  const badges = [
+    { badgeId: 'ga4-badge',    val: data.analytics.ga4Id,           label: 'GA4 configurado' },
+    { badgeId: 'meta-badge',   val: data.analytics.metaPixelId,     label: 'Meta Pixel configurado' },
+    { badgeId: 'tiktok-badge', val: data.analytics.tiktokPixelId,   label: 'TikTok Pixel configurado' }
+  ];
+  badges.forEach(({ badgeId, val, label }) => {
+    const el = document.getElementById(badgeId);
+    if (!el) return;
+    if (val && val.trim()) {
+      el.innerHTML = `<span class="analytics-badge configured">✓ ${label}</span>`;
+    } else {
+      el.innerHTML = `<span class="analytics-badge missing">Sin configurar</span>`;
+    }
+  });
+}
+
+/* ─── DASHBOARD STATS ─── */
+function updateDashboardStats() {
+  setInnerHTML('dash-treatments-count', (data.treatments || []).length);
+  setInnerHTML('dash-gallery-count',    (data.cases || []).length);
+  setInnerHTML('dash-testimonials-count', (data.testimonials || []).length);
+  setInnerHTML('dash-t-count',          (data.testimonials || []).length);
+
+  const gaOk   = !!(data.analytics.ga4Id && data.analytics.ga4Id.trim());
+  const metaOk = !!(data.analytics.metaPixelId && data.analytics.metaPixelId.trim());
+
+  setInnerHTML('dash-ga-status', gaOk
+    ? '<span class="dot-ok"></span>Configurado'
+    : '<span class="dot-warn"></span>Sin configurar');
+  setInnerHTML('dash-meta-status', metaOk
+    ? '<span class="dot-ok"></span>Configurado'
+    : '<span class="dot-warn"></span>Sin configurar');
+}
+
+/* ─── EXPORT / IMPORT ─── */
+function exportData() {
+  collectFormData();
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `la-clinica-data-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Archivo JSON exportado');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      // Deep merge parsed into data
+      Object.keys(parsed).forEach(k => { data[k] = parsed[k]; });
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      populateForms();
+      renderTreatments();
+      renderGallery();
+      renderTestimonials();
+      updateAnalyticsBadges();
+      updateDashboardStats();
+      showToast('Datos importados correctamente ✓');
+    } catch (err) {
+      showToast('Error al importar: archivo JSON inválido', 'err');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // reset input
+}
+
+/* ─── KEYBOARD SHORTCUT: Ctrl+S / Cmd+S ─── */
+document.addEventListener('keydown', function (e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    const app = document.getElementById('app');
+    if (app && app.classList.contains('visible')) {
+      saveData();
+    }
+  }
+});
+
+/* ─── FIREBASE INIT ─── */
+(function () {
+  const cfg = window.CLINIC_FIREBASE;
+  if (!cfg || !cfg.apiKey) return;
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(cfg);
+    window._fbDb      = firebase.firestore();
+    window._fbStorage = firebase.storage();
+    window._fbAuth    = firebase.auth();
+
+    // Maneja sesión automáticamente — sin recargar la página
+    window._fbAuth.onAuthStateChanged(function (user) {
+      const loginScreen = document.getElementById('loginScreen');
+      const app         = document.getElementById('app');
+      if (user) {
+        loginScreen.style.display = 'none';
+        app.classList.add('visible');
+        initApp();
+      } else {
+        app.classList.remove('visible');
+        loginScreen.style.display = 'flex';
+        document.getElementById('loginEmail').value    = '';
+        document.getElementById('loginPassword').value = '';
+      }
+    });
+  } catch (e) {
+    console.warn('Firebase init error:', e.message);
+  }
+})();
+</script>
+</body>
+</html>
