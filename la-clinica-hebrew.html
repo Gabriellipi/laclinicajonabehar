@@ -1969,6 +1969,7 @@ function applyAdminContent(){
           <div class="test-role">${t.role || ''}</div>
         </div>`).join('');
       track.innerHTML = cardHTML + cardHTML;
+      if (window.resetTestimonialCarousel) window.resetTestimonialCarousel();
     }
   }
 
@@ -2656,6 +2657,9 @@ function toggleFaq(btn){
     track.style.transform = 'translateX(' + pos + 'px)';
     requestAnimationFrame(tick);
   }
+
+  // Exposed so Firebase loader can reset after replacing innerHTML
+  window.resetTestimonialCarousel = function() { pos = 0; };
 
   track.addEventListener('mousedown', function(e) {
     isDragging = true;
