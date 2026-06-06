@@ -738,17 +738,31 @@
     /* ── CAROUSEL ── */
     .test-carousel {
       overflow:hidden; position:relative;
-      mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent);
-      -webkit-mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent);
+      mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);
+      -webkit-mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);
     }
     .test-track {
-      display:flex; gap:24px; width:max-content;
-      animation:testScroll 48s linear infinite;
+      display:flex; gap:20px; width:max-content;
+      will-change:transform;
+      cursor:grab; user-select:none;
     }
-    .test-carousel:hover .test-track { animation-play-state:paused; }
-    @keyframes testScroll {
-      from { transform:translateX(0); }
-      to   { transform:translateX(-50%); }
+    .test-track.is-dragging { cursor:grabbing; }
+    .test-nav {
+      display:flex; justify-content:center; align-items:center;
+      gap:16px; margin-top:32px;
+    }
+    .test-nav-btn {
+      width:44px; height:44px; border-radius:50%;
+      border:1px solid rgba(201,169,110,.35);
+      background:rgba(255,255,255,.5);
+      color:var(--gold); font-size:1.1rem;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:all .3s; backdrop-filter:blur(4px);
+    }
+    .test-nav-btn:hover {
+      border-color:var(--gold);
+      background:rgba(201,169,110,.12);
+      transform:scale(1.08);
     }
     .test-card {
       background:linear-gradient(145deg,#f8f9f9,#dde2e4);
@@ -791,7 +805,7 @@
 
     @media(max-width:600px){
       .test-card { width:280px; padding:30px 22px 26px; }
-      .test-track { gap:16px; animation-duration:36s; }
+      .test-track { gap:14px; }
     }
 
     /* ════════════════════════════════
@@ -1606,6 +1620,10 @@
         <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"El Dr. Behar es increíblemente profesional. El tratamiento fue exactamente lo que buscaba: natural, armonioso, sin exageraciones. Volvería sin dudarlo."</p><div class="test-name">Valentina M.</div><div class="test-role">הרמוניזציה · Buenos Aires</div></div>
         <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"טיפול השקעים תחת העיניים שלי שינה לגמרי את המראה שלי — נראית נוחה וצעירה יותר. ד"ר בהר עבד בדיוק ובמהירות."</p><div class="test-name">יעל ג.</div><div class="test-role">טיפול תחת העיניים · חיפה</div></div>
         <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"Llevo dos años con el Dr. Behar para mantenimiento con botox y siempre quedo encantada. Tiene una mano muy fina, entiende perfectamente lo que quiero. 100% recomendado."</p><div class="test-name">Laura S.</div><div class="test-role">נוירומודולטור · Madrid</div></div>
+      </div>
+      <div class="test-nav">
+        <button class="test-nav-btn" id="testPrev" aria-label="הקודם">&#8592;</button>
+        <button class="test-nav-btn" id="testNext" aria-label="הבא">&#8594;</button>
       </div>
     </div>
   </div>
@@ -2598,6 +2616,69 @@ function toggleFaq(btn){
   if(waFloat){
     setTimeout(() => waFloat.classList.add('badge-visible'), 3000);
   }
+})();
+
+/* ── TESTIMONIALS INFINITE MARQUEE ── */
+(function(){
+  const track = document.getElementById('testTrack');
+  const prevBtn = document.getElementById('testPrev');
+  const nextBtn = document.getElementById('testNext');
+  if (!track) return;
+
+  let pos = 0;
+  const speed = 0.55;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartPos = 0;
+
+  function halfWidth() { return track.scrollWidth / 2; }
+
+  function normalize(p) {
+    const hw = halfWidth();
+    if (!hw) return p;
+    while (p <= -hw) p += hw;
+    while (p > 0) p -= hw;
+    return p;
+  }
+
+  function tick() {
+    if (!isDragging) pos = normalize(pos - speed);
+    track.style.transform = 'translateX(' + pos + 'px)';
+    requestAnimationFrame(tick);
+  }
+
+  track.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartPos = pos;
+    track.classList.add('is-dragging');
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    pos = normalize(dragStartPos + (e.clientX - dragStartX));
+  });
+  document.addEventListener('mouseup', function() {
+    isDragging = false;
+    track.classList.remove('is-dragging');
+  });
+
+  track.addEventListener('touchstart', function(e) {
+    isDragging = true;
+    dragStartX = e.touches[0].clientX;
+    dragStartPos = pos;
+  }, { passive: true });
+  track.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    pos = normalize(dragStartPos + (e.touches[0].clientX - dragStartX));
+    e.preventDefault();
+  }, { passive: false });
+  track.addEventListener('touchend', function() { isDragging = false; });
+
+  if (prevBtn) prevBtn.addEventListener('click', function() { pos = normalize(pos + 364); });
+  if (nextBtn) nextBtn.addEventListener('click', function() { pos = normalize(pos - 364); });
+
+  requestAnimationFrame(tick);
 })();
 </script>
 </body>
