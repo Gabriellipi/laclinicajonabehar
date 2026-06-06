@@ -96,7 +96,7 @@
       --light:  #f4f5f5;
       --border: rgba(201,169,110,0.2);
     }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
     body {
       font-family: 'Heebo', sans-serif;
       font-weight: 300;
@@ -1132,20 +1132,20 @@
       .nav-logo-sub { font-size:.46rem; letter-spacing:.3em; }
       .nav-links { display:none; }
       .hamburger { display:flex; }
-      #hero { min-height:100dvh; padding:104px 20px 96px; }
-      .hero-content { width:min(100%,340px); }
-      .hero-logo-title { font-size:clamp(2.9rem,18vw,4.8rem); letter-spacing:.05em; }
-      .hero-logo-subtitle { font-size:.58rem; line-height:1.8; letter-spacing:.18em; max-width:300px; }
-      .hero-mono { font-size:clamp(5rem,32vw,7rem); margin-bottom:.18em; }
-      .hero-brand { font-size:.82rem; letter-spacing:.38em; margin-inline:-.38em; }
-      .hero-dr { font-size:.62rem; line-height:1.75; letter-spacing:.16em; margin:0 auto 2.2em; max-width:310px; }
-      .hero-byline { margin:-1.2em auto 2.1em; font-size:.82rem; letter-spacing:.14em; gap:10px; }
-      .hero-byline::before,.hero-byline::after { width:20px; }
-      .hero-tagline { font-size:1.18rem; margin-bottom:2.3em; }
-      .hero-scroll { bottom:1.45rem; }
+      #hero { min-height:100svh; padding:100px 24px 88px; }
+      .hero-content { width:100%; max-width:420px; padding-inline:0; }
+      .hero-logo-title { font-size:clamp(2.8rem,16vw,4.5rem); letter-spacing:.05em; }
+      .hero-logo-subtitle { font-size:.56rem; line-height:1.8; letter-spacing:.16em; max-width:100%; }
+      .hero-mono { font-size:clamp(4.5rem,28vw,6.5rem); margin-bottom:.18em; }
+      .hero-brand { font-size:.78rem; letter-spacing:.32em; margin-inline:0; }
+      .hero-dr { font-size:.61rem; line-height:1.75; letter-spacing:.15em; margin:0 auto 2em; max-width:100%; }
+      .hero-byline { margin:-1em auto 2em; font-size:.78rem; letter-spacing:.12em; gap:8px; }
+      .hero-byline::before,.hero-byline::after { width:16px; }
+      .hero-tagline { font-size:1.1rem; margin-bottom:2em; }
+      .hero-scroll { bottom:1.2rem; }
       .hero-scroll span { display:none; }
-      .scroll-line { height:28px; }
-      .btn-glass { width:min(100%,286px); padding:15px 18px; font-size:.74rem; letter-spacing:.16em; min-height:50px; }
+      .scroll-line { height:26px; }
+      .btn-glass { width:100%; max-width:300px; padding:15px 18px; font-size:.73rem; letter-spacing:.15em; min-height:50px; }
       .section-label { font-size:.61rem; letter-spacing:.24em; }
       .section-title { font-size:clamp(1.82rem,10vw,2.45rem); margin-bottom:.75em; }
       .gold-line { margin-bottom:1.6em; }
@@ -1615,21 +1615,6 @@
         <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"עשיתי טיפול בוטוקס בפעם הראשונה בחיי וחששתי מאוד. ד"ר בהר הקשיב לכל הדאגות שלי, הסביר בסבלנות ועבד בדיוק מדהים. התוצאה טבעית לגמרי."</p><div class="test-name">תמר כ.</div><div class="test-role">נוירומודולטור · חדרה</div></div>
         <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"אחרי שנים שחיפשתי מישהו שיבין מה אני רוצה — מצאתי את ד"ר בהר. הטיפול שדרג את המראה שלי בצורה עדינה ומדויקת. ממש ממליצה!"</p><div class="test-name">הילה מ.</div><div class="test-role">הרמוניזציה · חיפה</div></div>
         <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"הגעתי לד"ר בהר לאחר המלצה חמה של חברה. טיפול ה-Skin Booster שיפר את המרקם של העור שלי בצורה מדהימה — עור מוצק, זוהר וחי. אני מרוצה מאוד!"</p><div class="test-name">ליאור ב.</div><div class="test-role">Skin Booster · נצרת עילית</div></div>
-        <!-- duplicado para loop infinito -->
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"ד"ר בהר הוא מקצוען אמיתי. תוצאות ה-PRP עלו על כל ציפיותיי — הפנים שלי נראות רעננות וטבעיות לחלוטין."</p><div class="test-name">מיכל ל.</div><div class="test-role">PRP · נהריה</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"ניגשתי לטיפול בחשש, אבל ד"ר בהר הסביר כל שלב בסבלנות. הבוטוקס יצא מדויק ומקצועי — ממליצה בחום!"</p><div class="test-name">שירה מ.</div><div class="test-role">נוירומודולטור · חיפה</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"הרמוניזציה הפנים שינתה את ההרגשה שלי לגמרי. כולם שואלים מה עשיתי, אבל נראה הכי טבעי שיש."</p><div class="test-name">דניאל ק.</div><div class="test-role">הרמוניזציה · עכו</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"עשיתי Skin Booster לפני החתונה שלי ולא יכולתי להיות מרוצה יותר. העור שלי זהר, כולם שאלו מה הסוד שלי. מקצוענות ברמה אחרת!"</p><div class="test-name">נועה ש.</div><div class="test-role">Skin Booster · כרמיאל</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"עשיתי PRP לשיער אחרי שנים של נשירה. אחרי 3 חודשים ראיתי תוצאות ממשיות — שיער חדש ועבה יותר. ממליץ בחום!"</p><div class="test-name">אלון ר.</div><div class="test-role">PRP שיער · עכו</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"הייעוץ לפני הטיפול היה מפורט ומרגיע. הריינומודלינג נראה טבעי לחלוטין — סימטרי ומאוזן, בלי שום מלאכותיות."</p><div class="test-name">רונית א.</div><div class="test-role">ריינומודלינג · נהריה</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"El Dr. Behar es increíblemente profesional. El tratamiento fue exactamente lo que buscaba: natural, armonioso, sin exageraciones. Volvería sin dudarlo."</p><div class="test-name">Valentina M.</div><div class="test-role">הרמוניזציה · Buenos Aires</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"טיפול השקעים תחת העיניים שלי שינה לגמרי את המראה שלי — נראית נוחה וצעירה יותר. ד"ר בהר עבד בדיוק ובמהירות."</p><div class="test-name">יעל ג.</div><div class="test-role">טיפול תחת העיניים · חיפה</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"Llevo dos años con el Dr. Behar para mantenimiento con botox y siempre quedo encantada. Tiene una mano muy fina, entiende perfectamente lo que quiero. 100% recomendado."</p><div class="test-name">Laura S.</div><div class="test-role">נוירומודולטור · Madrid</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"I was nervous about aesthetic treatments, but Dr. Behar made me feel completely at ease. The results are subtle and absolutely natural — exactly what I was looking for. Highly recommend."</p><div class="test-name">Sophie R.</div><div class="test-role">Skin Booster · Tel Aviv</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"Vine desde Buenos Aires especialmente para hacer el tratamiento con el Dr. Behar. La diferencia es notable: el rostro más descansado, más joven, sin perder naturalidad. Vale cada kilómetro."</p><div class="test-name">Daniela F.</div><div class="test-role">הרמוניזציה · Buenos Aires</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"עשיתי טיפול בוטוקס בפעם הראשונה בחיי וחששתי מאוד. ד"ר בהר הקשיב לכל הדאגות שלי, הסביר בסבלנות ועבד בדיוק מדהים. התוצאה טבעית לגמרי."</p><div class="test-name">תמר כ.</div><div class="test-role">נוירומודולטור · חדרה</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"אחרי שנים שחיפשתי מישהו שיבין מה אני רוצה — מצאתי את ד"ר בהר. הטיפול שדרג את המראה שלי בצורה עדינה ומדויקת. ממש ממליצה!"</p><div class="test-name">הילה מ.</div><div class="test-role">הרמוניזציה · חיפה</div></div>
-        <div class="test-card"><div class="stars">★★★★★</div><p class="test-text">"הגעתי לד"ר בהר לאחר המלצה חמה של חברה. טיפול ה-Skin Booster שיפר את המרקם של העור שלי בצורה מדהימה — עור מוצק, זוהר וחי. אני מרוצה מאוד!"</p><div class="test-name">ליאור ב.</div><div class="test-role">Skin Booster · נצרת עילית</div></div>
       </div>
       <div class="test-nav">
         <button class="test-nav-btn" id="testPrev" aria-label="הקודם">&#8592;</button>
@@ -1957,18 +1942,17 @@ function applyAdminContent(){
     if(logo && logo.tagName === 'IMG') logo.src = c.images.logoSrc;
   }
 
-  // Testimonials — only replace HTML if Firebase has 8+ entries
+  // Testimonials — replace HTML only if Firebase has 8+ entries
   if(c.testimonials && c.testimonials.length >= 8){
     const track = document.getElementById('testTrack');
     if(track){
-      const cardHTML = c.testimonials.map(t => `
+      track.innerHTML = c.testimonials.map(t => `
         <div class="test-card">
           <div class="stars">${'★'.repeat(t.stars || 5)}</div>
           <p class="test-text">"${t.text}"</p>
           <div class="test-name">${t.name}</div>
           <div class="test-role">${t.role || ''}</div>
         </div>`).join('');
-      track.innerHTML = cardHTML + cardHTML;
       if (window.resetTestimonialCarousel) window.resetTestimonialCarousel();
     }
   }
@@ -2637,31 +2621,47 @@ function toggleFaq(btn){
   if (!track) return;
 
   let pos = 0;
+  let halfW = 0;
   const speed = 0.55;
   let isDragging = false;
   let dragStartX = 0;
   let dragStartPos = 0;
+  let started = false;
 
-  function halfWidth() { return track.scrollWidth / 2; }
-
-  function normalize(p) {
-    const hw = halfWidth();
-    if (!hw) return p;
-    while (p <= -hw) p += hw;
-    while (p > 0) p -= hw;
-    return p;
+  function buildLoop() {
+    // Remove clones from previous build
+    Array.from(track.children).forEach(function(c) {
+      if (c.dataset.clone) c.remove();
+    });
+    // Clone all current originals
+    Array.from(track.children).forEach(function(orig) {
+      var cl = orig.cloneNode(true);
+      cl.dataset.clone = '1';
+      track.appendChild(cl);
+    });
+    pos = 0;
+    // Measure after browser paints the new nodes
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        halfW = track.scrollWidth / 2;
+      });
+    });
   }
 
+  window.resetTestimonialCarousel = buildLoop;
+
   function tick() {
-    if (!isDragging) pos = normalize(pos - speed);
+    if (halfW > 0 && !isDragging) {
+      pos -= speed;
+      if (pos <= -halfW) pos += halfW;
+      if (pos > 0) pos = 0;
+    }
     track.style.transform = 'translateX(' + pos + 'px)';
     requestAnimationFrame(tick);
   }
 
-  // Exposed so Firebase loader can reset after replacing innerHTML
-  window.resetTestimonialCarousel = function() { pos = 0; };
-
   track.addEventListener('mousedown', function(e) {
+    if (!halfW) return;
     isDragging = true;
     dragStartX = e.clientX;
     dragStartPos = pos;
@@ -2670,7 +2670,10 @@ function toggleFaq(btn){
   });
   document.addEventListener('mousemove', function(e) {
     if (!isDragging) return;
-    pos = normalize(dragStartPos + (e.clientX - dragStartX));
+    var p = dragStartPos + (e.clientX - dragStartX);
+    if (p <= -halfW) p += halfW;
+    if (p > 0) p -= halfW;
+    pos = p;
   });
   document.addEventListener('mouseup', function() {
     isDragging = false;
@@ -2678,20 +2681,29 @@ function toggleFaq(btn){
   });
 
   track.addEventListener('touchstart', function(e) {
+    if (!halfW) return;
     isDragging = true;
     dragStartX = e.touches[0].clientX;
     dragStartPos = pos;
   }, { passive: true });
   track.addEventListener('touchmove', function(e) {
     if (!isDragging) return;
-    pos = normalize(dragStartPos + (e.touches[0].clientX - dragStartX));
+    var p = dragStartPos + (e.touches[0].clientX - dragStartX);
+    if (p <= -halfW) p += halfW;
+    if (p > 0) p -= halfW;
+    pos = p;
     e.preventDefault();
   }, { passive: false });
   track.addEventListener('touchend', function() { isDragging = false; });
 
-  if (prevBtn) prevBtn.addEventListener('click', function() { pos = normalize(pos + 364); });
-  if (nextBtn) nextBtn.addEventListener('click', function() { pos = normalize(pos - 364); });
+  if (prevBtn) prevBtn.addEventListener('click', function() {
+    pos += 300; if (pos > 0) pos -= halfW;
+  });
+  if (nextBtn) nextBtn.addEventListener('click', function() {
+    pos -= 300; if (pos <= -halfW) pos += halfW;
+  });
 
+  buildLoop();
   requestAnimationFrame(tick);
 })();
 </script>
