@@ -1957,8 +1957,8 @@ function applyAdminContent(){
     if(logo && logo.tagName === 'IMG') logo.src = c.images.logoSrc;
   }
 
-  // Testimonials
-  if(c.testimonials && c.testimonials.length){
+  // Testimonials — only replace HTML if Firebase has 8+ entries
+  if(c.testimonials && c.testimonials.length >= 8){
     const track = document.getElementById('testTrack');
     if(track){
       const cardHTML = c.testimonials.map(t => `
