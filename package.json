@@ -1,0 +1,24 @@
+{
+  "name": "clinica-jona-behar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "firebase-config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gabriellipi/laclinicajonabehar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Gabriellipi/laclinicajonabehar/issues"
+  },
+  "homepage": "https://github.com/Gabriellipi/laclinicajonabehar#readme",
+  "dependencies": {
+    "framer-motion": "^12.40.0"
+  }
+}

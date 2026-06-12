@@ -209,6 +209,7 @@
     .nav-logo {
       display:flex; flex-direction:column; align-items:flex-start; gap:3px;
       color:var(--white); text-transform:uppercase; line-height:1;
+      min-height:44px; justify-content:center;
     }
     .nav-logo-main {
       font-family:'Cormorant Garamond',serif; font-weight:300;
@@ -223,6 +224,7 @@
     .nav-links a {
       font-size:.75rem; letter-spacing:.14em; color:rgba(255,255,255,.7);
       text-transform:uppercase; transition:color .3s; font-weight:300;
+      min-height:44px; display:inline-flex; align-items:center;
     }
     .nav-links a:hover { color:var(--gold); }
     .hamburger { display:none; width:44px; height:44px; margin-inline-start:-10px; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; }
@@ -466,6 +468,11 @@
       transform:scale(1.015);
       transition:transform .9s cubic-bezier(.23,1,.32,1), filter .9s cubic-bezier(.23,1,.32,1);
     }
+    .about-photo img.about-logo {
+      object-fit:cover;
+      object-position:center;
+      filter:saturate(.95) contrast(1.02) brightness(1);
+    }
     .about-photo-wrap:hover .about-photo img {
       transform:scale(1.055);
       filter:saturate(.95) contrast(1.09) brightness(.95);
@@ -629,6 +636,97 @@
     }
 
     /* ════════════════════════════════
+       MATERIALS — trusted aesthetic brands
+    ════════════════════════════════ */
+    #materials {
+      background:linear-gradient(180deg,#f8f9f9 0%,#e4e8ea 100%);
+      position:relative; overflow:hidden;
+    }
+    #materials::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        radial-gradient(ellipse 58% 34% at 18% 18%, rgba(255,255,255,.72), transparent),
+        radial-gradient(ellipse 45% 35% at 86% 76%, rgba(201,169,110,.10), transparent);
+    }
+    .materials-layout {
+      position:relative;
+      display:grid; grid-template-columns:.88fr 1.42fr;
+      gap:58px; align-items:center;
+    }
+    .materials-copy {
+      padding-inline-start:8px;
+    }
+    .materials-copy .section-title {
+      color:var(--black); margin-bottom:.7em;
+    }
+    .materials-text {
+      font-size:.9rem; line-height:2;
+      color:rgba(47,51,54,.66);
+      max-width:440px; margin-bottom:2em;
+    }
+    .materials-proof {
+      display:grid; gap:12px;
+    }
+    .materials-proof span {
+      display:flex; align-items:center; gap:10px;
+      font-size:.76rem; color:rgba(47,51,54,.72);
+      letter-spacing:.05em;
+    }
+    .materials-proof span::before {
+      content:''; width:7px; height:7px; border-radius:50%;
+      background:var(--gold); box-shadow:0 0 0 6px rgba(201,169,110,.10);
+      flex-shrink:0;
+    }
+    .materials-grid {
+      display:grid; grid-template-columns:repeat(2,1fr);
+      gap:1px;
+      background:rgba(88,96,102,.16);
+      border:1px solid rgba(255,255,255,.70);
+      box-shadow:0 24px 70px rgba(58,64,68,.11);
+    }
+    .material-card {
+      min-height:168px;
+      padding:30px 28px 24px;
+      background:rgba(255,255,255,.68);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; position:relative; overflow:hidden;
+      transition:background .35s, transform .35s, box-shadow .35s;
+    }
+    .material-card::before {
+      content:''; position:absolute; top:0; left:20%; right:20%; height:1px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
+      opacity:0; transition:opacity .35s;
+    }
+    .material-card:hover {
+      background:#fff;
+      transform:translateY(-2px);
+      box-shadow:0 16px 42px rgba(58,64,68,.10);
+      z-index:2;
+    }
+    .material-card:hover::before { opacity:1; }
+    .material-logo {
+      width:min(100%,230px); height:70px;
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:18px;
+    }
+    .material-logo img {
+      max-width:100%; max-height:100%;
+      object-fit:contain;
+      filter:saturate(.92) contrast(1.04);
+    }
+    .material-name {
+      font-size:.64rem; letter-spacing:.22em;
+      color:var(--gold); text-transform:uppercase;
+    }
+    .materials-note {
+      position:relative;
+      margin-top:24px; text-align:center;
+      font-size:.7rem; line-height:1.85;
+      color:rgba(47,51,54,.50);
+    }
+
+    /* ════════════════════════════════
        GALLERY — silver clinic luxury
     ════════════════════════════════ */
     #gallery {
@@ -745,8 +843,14 @@
       display:flex; gap:20px; width:max-content;
       will-change:transform;
       cursor:grab; user-select:none;
+      animation:testMarquee 72s linear infinite;
     }
-    .test-track.is-dragging { cursor:grabbing; }
+    .test-track.is-dragging { cursor:grabbing; animation-play-state:paused; }
+    .test-carousel:hover .test-track { animation-play-state:paused; }
+    @keyframes testMarquee {
+      from { transform:translateX(0); }
+      to { transform:translateX(calc(-1 * var(--test-loop-width, 5040px))); }
+    }
     .test-nav {
       display:flex; justify-content:center; align-items:center;
       gap:16px; margin-top:32px;
@@ -817,6 +921,7 @@
       display:block; font-size:.72rem; letter-spacing:.22em; color:var(--gold);
       text-transform:uppercase; margin-top:.5em;
       direction:ltr; unicode-bidi:isolate;
+      min-height:44px; align-content:center;
     }
     .ig-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
     .ig-item {
@@ -1081,11 +1186,11 @@
     .ft-sub { font-size:.68rem; letter-spacing:.18em; color:rgba(255,255,255,.35); text-transform:uppercase; margin-bottom:2em; }
     .ft-div { width:40px; height:1px; background:var(--border); margin:0 auto 2em; }
     .ft-links { display:flex; align-items:center; justify-content:center; gap:2rem; margin-bottom:2.5em; }
-    .ft-links a { font-size:.68rem; letter-spacing:.15em; color:rgba(255,255,255,.4); text-transform:uppercase; transition:color .3s; }
+    .ft-links a { min-height:44px; display:inline-flex; align-items:center; padding-inline:12px; font-size:.68rem; letter-spacing:.15em; color:rgba(255,255,255,.4); text-transform:uppercase; transition:color .3s; }
     .ft-links a:hover { color:var(--gold); }
     .ft-social { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:2.5em; }
     .ft-soc {
-      width:38px; height:38px; border:1px solid rgba(201,169,110,.25);
+      width:44px; height:44px; border:1px solid rgba(201,169,110,.25);
       display:flex; align-items:center; justify-content:center;
       color:rgba(255,255,255,.45); font-size:.9rem; transition:all .3s;
     }
@@ -1119,6 +1224,8 @@
       .location-card { grid-template-columns:1fr; max-width:720px; }
       .map-wrap { min-height:360px; }
       .services-grid { grid-template-columns:repeat(2,1fr); }
+      .materials-layout { grid-template-columns:1fr; gap:40px; }
+      .materials-text { max-width:680px; }
       .why-grid { grid-template-columns:repeat(2,1fr); }
       .ig-grid { grid-template-columns:repeat(3,1fr); }
     }
@@ -1157,6 +1264,9 @@
       .about-bio { font-size:.88rem; line-height:1.85; margin-bottom:1.8em; }
       .cred { min-height:48px; padding:12px 14px; }
       .services-grid { grid-template-columns:1fr 1fr; }
+      .materials-grid { grid-template-columns:1fr 1fr; }
+      .material-card { min-height:145px; padding:24px 18px 20px; }
+      .material-logo { height:58px; margin-bottom:14px; }
       .services-head,.gallery-head,.why-head,.test-head,.ig-head,.bk-head { margin-bottom:34px; }
       .svc-card { padding:28px 20px 24px; }
       .svc-card-ghost { font-size:4rem; bottom:-6px; left:10px; }
@@ -1198,6 +1308,7 @@
       .location-card { margin-top:4em; }
       .map-wrap { min-height:320px; }
       .ft-links { flex-wrap:wrap; gap:1rem 1.45rem; padding-inline:16px; }
+      .ft-social { gap:12px; }
       .ft-copy { width:min(100% - 32px,520px); margin-inline:auto; line-height:1.8; }
       .wa-float { left:18px; bottom:max(18px,env(safe-area-inset-bottom)); width:54px; height:54px; }
       .wa-tip { display:none; }
@@ -1214,6 +1325,12 @@
       .hero-dr { max-width:100%; }
       .mobile-menu { gap:1.45rem; }
       .services-grid { grid-template-columns:1fr; }
+      .materials-grid { grid-template-columns:1fr; }
+      .materials-copy { padding-inline-start:0; text-align:center; }
+      .materials-copy .gold-line { margin-inline:auto; }
+      .materials-text { margin-inline:auto; }
+      .materials-proof { text-align:right; }
+      .material-card { min-height:132px; }
       .svc-card { padding:26px 18px 22px; }
       .svc-card-ghost { font-size:3.5rem; }
       .gallery-grid { grid-template-columns:1fr; }
@@ -1232,6 +1349,8 @@
       .location-info { padding:30px 22px; }
       .map-wrap { min-height:280px; }
       .bk-confirm { padding:40px 20px; }
+      .faq-q { min-height:64px; padding:18px 0; font-size:.86rem; }
+      .admin-ghost { width:44px; height:44px; bottom:max(10px,env(safe-area-inset-bottom)); right:10px; }
     }
     @media (hover:none), (pointer:coarse) {
       body { cursor:auto; }
@@ -1386,7 +1505,7 @@
     .admin-ghost {
       position: fixed; bottom: 18px; right: 18px;
       z-index: 8000;
-      width: 28px; height: 28px;
+      width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1rem; text-decoration: none; color: var(--white);
       opacity: .12;
@@ -1396,7 +1515,7 @@
     }
     .admin-ghost:hover { opacity: .48; }
     @media(max-width:768px){
-      .admin-ghost { bottom: max(14px,env(safe-area-inset-bottom)); right: 14px; }
+      .admin-ghost { bottom: max(10px,env(safe-area-inset-bottom)); right: 10px; }
     }
   </style>
 </head>
@@ -1485,7 +1604,7 @@
     <div class="about-grid">
       <div class="about-photo-wrap reveal reveal-fade">
         <div class="about-photo">
-          <img class="about-photo-focus" src="assets/doctor-photo.jpg" alt="ד&quot;ר יונתן בהר גרינפלד בקליניקה" loading="lazy">
+          <img class="about-photo-focus about-logo" src="assets/clinic-logo-about.jpeg" alt="La Clínica aesthetic medicine" loading="lazy">
         </div>
         <div class="photo-border"></div>
         <div class="photo-accent"></div>
@@ -1557,6 +1676,47 @@
   </div>
 </section>
 
+<!-- ══ MATERIALS ══ -->
+<section id="materials">
+  <div class="container">
+    <div class="materials-layout">
+      <div class="materials-copy reveal">
+        <span class="section-label">חומרים מובילים</span>
+        <h2 class="section-title">מותגים רפואיים שנבחרים בקפידה</h2>
+        <div class="gold-line"></div>
+        <p class="materials-text">
+          אנו עובדים עם חומרים מוכרים ואיכותיים בתחום הרפואה האסתטית, בהתאמה אישית
+          למבנה הפנים, סוג העור והמטרה הטיפולית של כל מטופל.
+        </p>
+        <div class="materials-proof">
+          <span>בחירה מותאמת אישית לכל טיפול</span>
+          <span>חומרים מוכרים בעולם האסתטיקה הרפואית</span>
+          <span>גישה שמעדיפה תוצאה טבעית ומדויקת</span>
+        </div>
+      </div>
+      <div class="materials-grid reveal reveal-fade" aria-label="מותגי חומרים אסתטיים">
+        <div class="material-card">
+          <div class="material-logo"><img src="assets/material-rejuran.png" alt="Rejuran" loading="eager" decoding="async"></div>
+          <div class="material-name">Rejuran</div>
+        </div>
+        <div class="material-card">
+          <div class="material-logo"><img src="assets/material-neauvia.png" alt="Neauvia" loading="eager" decoding="async"></div>
+          <div class="material-name">Neauvia</div>
+        </div>
+        <div class="material-card">
+          <div class="material-logo"><img src="assets/material-radiesse.png" alt="Radiesse" loading="eager" decoding="async"></div>
+          <div class="material-name">Radiesse</div>
+        </div>
+        <div class="material-card">
+          <div class="material-logo"><img src="assets/material-stylage.webp" alt="Stylage" loading="eager" decoding="async"></div>
+          <div class="material-name">Stylage</div>
+        </div>
+      </div>
+    </div>
+    <p class="materials-note reveal">* סוג החומר והטיפול נקבעים לאחר ייעוץ רפואי ובהתאם להתאמה אישית.</p>
+  </div>
+</section>
+
 <!-- ══ GALLERY ══ -->
 <section id="gallery">
   <div class="container">
@@ -1564,17 +1724,17 @@
       <span class="section-label">תוצאות</span>
       <h2 class="section-title">לפני ואחרי</h2>
       <div class="gold-line center"></div>
-      <p style="font-size:.83rem;color:var(--gray)">גלו את התוצאה בתצוגה לפני ואחרי</p>
+      <p style="font-size:.83rem;color:var(--gray)">תמונות הדגמה לתצוגת לפני ואחרי</p>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-item reveal reveal-fade"><div class="g-before"></div><div class="g-after"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">ריינומודלינג</div></div>
-      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background:linear-gradient(145deg,#141414,#252525)"></div><div class="g-after" style="background:linear-gradient(145deg,#1a150a,#352510)"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">PRP קפילרי</div></div>
-      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background:linear-gradient(145deg,#c7ced3,#eef1f2)"></div><div class="g-after" style="background:linear-gradient(145deg,#f8f9f9,#cfd5d8)"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">הרמוניזציה</div></div>
-      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background:linear-gradient(145deg,#1c1c1c,#2a2a2a)"></div><div class="g-after" style="background:linear-gradient(145deg,#201508,#3a2510)"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">פריאורביטלי</div></div>
-      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background:linear-gradient(145deg,#181818,#262626)"></div><div class="g-after" style="background:linear-gradient(145deg,#1c1408,#342008)"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">הגדלת שפתיים</div></div>
-      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background:linear-gradient(145deg,#141414,#202020)"></div><div class="g-after" style="background:linear-gradient(145deg,#18100a,#2c1e0c)"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">Skin Booster</div></div>
+      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background-image:url('assets/instagram-dx6iijlduny.jpg');background-size:cover;background-position:center"></div><div class="g-after" style="background-image:url('assets/instagram-dx9cil7tjnd.jpg');background-size:cover;background-position:center"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">ריינומודלינג</div></div>
+      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background-image:url('assets/instagram-dxoecyidetj.jpg');background-size:cover;background-position:center"></div><div class="g-after" style="background-image:url('assets/instagram-dv6yzlzdrs0.jpg');background-size:cover;background-position:center"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">PRP קפילרי</div></div>
+      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background-image:url('assets/instagram-dx3mvfytkcm.jpg');background-size:cover;background-position:center"></div><div class="g-after" style="background-image:url('assets/instagram-dx6iijlduny.jpg');background-size:cover;background-position:center"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">הרמוניזציה</div></div>
+      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background-image:url('assets/instagram-dv6yzlzdrs0.jpg');background-size:cover;background-position:center"></div><div class="g-after" style="background-image:url('assets/instagram-dx9cil7tjnd.jpg');background-size:cover;background-position:center"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">פריאורביטלי</div></div>
+      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background-image:url('assets/instagram-dxg3ublnbz5.jpg');background-size:cover;background-position:center"></div><div class="g-after" style="background-image:url('assets/instagram-dxoecyidetj.jpg');background-size:cover;background-position:center"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">הגדלת שפתיים</div></div>
+      <div class="gallery-item reveal reveal-fade"><div class="g-before" style="background-image:url('assets/instagram-dx9cil7tjnd.jpg');background-size:cover;background-position:center"></div><div class="g-after" style="background-image:url('assets/instagram-dx3mvfytkcm.jpg');background-size:cover;background-position:center"></div><div class="g-tag">לפני</div><div class="g-after-tag">אחרי</div><div class="g-label">Skin Booster</div></div>
     </div>
-    <p class="gallery-note reveal">* תוצאות אינדיבידואליות עשויות להשתנות.</p>
+    <p class="gallery-note reveal">* הדמיה עיצובית בלבד. תוצאות אמיתיות אינדיבידואליות ועשויות להשתנות.</p>
   </div>
 </section>
 
@@ -1863,6 +2023,7 @@
 <script src="firebase-config.js"></script>
 <script>
 const ADMIN_STORE = 'clinicAdminContentV1';
+const DEFAULT_DOCTOR_PHOTO = 'assets/doctor-photo.jpg';
 let ADMIN_CONTENT = null;
 try { ADMIN_CONTENT = JSON.parse(localStorage.getItem(ADMIN_STORE) || 'null'); } catch(e) { ADMIN_CONTENT = null; }
 
@@ -1906,7 +2067,7 @@ function applyAdminContent(){
   adminText('.location-title', c.location && c.location.title);
   adminText('.location-address', c.location && c.location.description);
 
-  if(c.images && c.images.doctorPhoto){
+  if(c.images && c.images.doctorPhoto && c.images.doctorPhoto !== DEFAULT_DOCTOR_PHOTO){
     const photo = document.querySelector('.about-photo img');
     if(photo) photo.src = c.images.doctorPhoto;
   }
@@ -1961,7 +2122,7 @@ function applyAdminContent(){
     }
   }
 
-  if(c.cases && c.cases.length){
+  if(c.cases && c.cases.some(item => item.before || item.after)){
     const grid = document.querySelector('.gallery-grid');
     if(grid){
       grid.innerHTML = c.cases.map(item => `
@@ -2625,47 +2786,74 @@ function toggleFaq(btn){
   if (!track) return;
 
   let pos = 0;
-  let halfW = 0;
+  let loopW = 0;
   const speed = 0.55;
   let isDragging = false;
   let dragStartX = 0;
   let dragStartPos = 0;
-  let started = false;
+  let animationOffset = 0;
+  let originals = Array.from(track.children).map(function(card) {
+    return card.cloneNode(true);
+  });
+
+  function normalize(value) {
+    if (!loopW) return value;
+    while (value <= -loopW) value += loopW;
+    while (value > 0) value -= loopW;
+    return value;
+  }
 
   function buildLoop() {
-    // Remove clones from previous build
-    Array.from(track.children).forEach(function(c) {
-      if (c.dataset.clone) c.remove();
+    const currentOriginals = Array.from(track.children).filter(function(card) {
+      return !card.dataset.clone;
     });
-    // Clone all current originals
-    Array.from(track.children).forEach(function(orig) {
-      var cl = orig.cloneNode(true);
-      cl.dataset.clone = '1';
-      track.appendChild(cl);
-    });
-    pos = 0;
-    // Measure after browser paints the new nodes
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        halfW = track.scrollWidth / 2;
+    if (currentOriginals.length) {
+      originals = currentOriginals.map(function(card) {
+        const clean = card.cloneNode(true);
+        delete clean.dataset.clone;
+        return clean;
       });
+    }
+    const carousel = document.getElementById('testCarousel');
+    const minWidth = (carousel ? carousel.offsetWidth : window.innerWidth) * 2.5;
+    track.innerHTML = '';
+    originals.forEach(function(card) {
+      track.appendChild(card.cloneNode(true));
+    });
+    loopW = track.scrollWidth;
+    while (track.scrollWidth < loopW + minWidth) {
+      originals.forEach(function(card) {
+        const clone = card.cloneNode(true);
+        clone.dataset.clone = '1';
+        track.appendChild(clone);
+      });
+    }
+    pos = 0;
+    requestAnimationFrame(function() {
+      loopW = Array.from(track.children)
+        .filter(function(card) { return !card.dataset.clone; })
+        .reduce(function(total, card) {
+          return total + card.getBoundingClientRect().width;
+        }, 0);
+      const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || 0);
+      loopW += gap * Math.max(originals.length - 1, 0);
+      track.style.setProperty('--test-loop-width', loopW + 'px');
+      pos = normalize(pos);
     });
   }
 
   window.resetTestimonialCarousel = buildLoop;
 
   function tick() {
-    if (halfW > 0 && !isDragging) {
-      pos -= speed;
-      if (pos <= -halfW) pos += halfW;
-      if (pos > 0) pos = 0;
+    if (loopW > 0 && !isDragging) {
+      pos = normalize(pos - speed);
     }
     track.style.transform = 'translateX(' + pos + 'px)';
     requestAnimationFrame(tick);
   }
 
   track.addEventListener('mousedown', function(e) {
-    if (!halfW) return;
+    if (!loopW) return;
     isDragging = true;
     dragStartX = e.clientX;
     dragStartPos = pos;
@@ -2675,17 +2863,17 @@ function toggleFaq(btn){
   document.addEventListener('mousemove', function(e) {
     if (!isDragging) return;
     var p = dragStartPos + (e.clientX - dragStartX);
-    if (p <= -halfW) p += halfW;
-    if (p > 0) p -= halfW;
-    pos = p;
+    pos = normalize(p);
+    track.style.transform = 'translateX(' + pos + 'px)';
   });
   document.addEventListener('mouseup', function() {
     isDragging = false;
     track.classList.remove('is-dragging');
+    track.style.transform = '';
   });
 
   track.addEventListener('touchstart', function(e) {
-    if (!halfW) return;
+    if (!loopW) return;
     isDragging = true;
     dragStartX = e.touches[0].clientX;
     dragStartPos = pos;
@@ -2693,22 +2881,26 @@ function toggleFaq(btn){
   track.addEventListener('touchmove', function(e) {
     if (!isDragging) return;
     var p = dragStartPos + (e.touches[0].clientX - dragStartX);
-    if (p <= -halfW) p += halfW;
-    if (p > 0) p -= halfW;
-    pos = p;
+    pos = normalize(p);
+    track.style.transform = 'translateX(' + pos + 'px)';
     e.preventDefault();
   }, { passive: false });
-  track.addEventListener('touchend', function() { isDragging = false; });
+  track.addEventListener('touchend', function() {
+    isDragging = false;
+    track.style.transform = '';
+  });
 
   if (prevBtn) prevBtn.addEventListener('click', function() {
-    pos += 300; if (pos > 0) pos -= halfW;
+    animationOffset += 6;
+    track.style.animationDelay = animationOffset + 's';
   });
   if (nextBtn) nextBtn.addEventListener('click', function() {
-    pos -= 300; if (pos <= -halfW) pos += halfW;
+    animationOffset -= 6;
+    track.style.animationDelay = animationOffset + 's';
   });
 
   buildLoop();
-  requestAnimationFrame(tick);
+  window.addEventListener('resize', buildLoop);
 })();
 </script>
 </body>
