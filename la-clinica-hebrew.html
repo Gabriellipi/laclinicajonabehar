@@ -1546,9 +1546,9 @@
 <nav id="navbar">
   <div class="container">
     <div class="nav-inner">
-      <a href="#hero" class="nav-logo" aria-label="La Clínica, Dr. Jonathan Behar">
+      <a href="#hero" class="nav-logo" aria-label="La Clínica, Dr. Julieta Szapowalo">
         <span class="nav-logo-main">La <span>Clínica</span></span>
-        <span class="nav-logo-sub">Dr. Jonathan Behar</span>
+        <span class="nav-logo-sub">Dr. Julieta Szapowalo</span>
       </a>
       <ul class="nav-links">
         <li><a href="#hero">בית</a></li>
@@ -1580,9 +1580,9 @@
   <div id="heroOverlay"></div>
   <canvas id="heroCanvas"></canvas>
   <div class="hero-content">
-    <div class="hero-logo" aria-label="La Clínica – Dr. Jonathan Behar Aesthetic Medicine">
+    <div class="hero-logo" aria-label="La Clínica – Dr. Julieta Szapowalo Aesthetic Medicine">
       <div class="hero-logo-title">La <span>Clínica</span></div>
-      <div class="hero-logo-subtitle">Dr. Jonathan Behar · Aesthetic Medicine</div>
+      <div class="hero-logo-subtitle">Dr. Julieta Szapowalo · Aesthetic Medicine</div>
     </div>
     <div class="hero-divider center"></div>
     <p class="hero-tagline">היכן שמדע פוגש יופי</p>
@@ -2024,6 +2024,7 @@
 <script>
 const ADMIN_STORE = 'clinicAdminContentV1';
 const DEFAULT_DOCTOR_PHOTO = 'assets/doctor-photo.jpg';
+const OLD_HERO_DOCTOR = 'Dr. Jonathan Behar · Aesthetic Medicine';
 let ADMIN_CONTENT = null;
 try { ADMIN_CONTENT = JSON.parse(localStorage.getItem(ADMIN_STORE) || 'null'); } catch(e) { ADMIN_CONTENT = null; }
 
@@ -2059,7 +2060,7 @@ function applyAdminContent(){
   adminText('.hero-brand', c.hero && c.hero.brand);
   adminText('.hero-dr', c.hero && c.hero.doctor);
   adminText('.hero-logo-title', c.hero && c.hero.brand);
-  adminText('.hero-logo-subtitle', c.hero && c.hero.doctor);
+  adminText('.hero-logo-subtitle', c.hero && c.hero.doctor === OLD_HERO_DOCTOR ? null : c.hero && c.hero.doctor);
   adminText('.hero-tagline', c.hero && c.hero.tagline);
   adminText('.about-name', c.about && c.about.name);
   adminText('.about-role', c.about && c.about.role);
