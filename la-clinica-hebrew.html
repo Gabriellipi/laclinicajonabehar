@@ -1957,28 +1957,28 @@
     <div class="location-card reveal" id="location">
       <div class="location-info">
         <div class="location-eyebrow">מיקום הקליניקה</div>
-        <h3 class="location-title">Touch Clinic, נהריה</h3>
+        <h3 class="location-title">La Clinica, נהריה</h3>
         <p class="location-address">
           הקליניקה נמצאת בנהריה, ישראל. לנוחותכם ניתן לפתוח ניווט ישיר במפות ולוודא את פרטי ההגעה לפני התור.
         </p>
         <div class="location-meta" aria-label="Clinic location details">
           <span><i class="location-dot" aria-hidden="true"></i>נהריה, ישראל</span>
-          <span><i class="location-dot" aria-hidden="true"></i>Touch Clinic</span>
+          <span><i class="location-dot" aria-hidden="true"></i>La Clinica</span>
         </div>
         <div class="location-actions">
           <a
             class="location-link primary"
-            href="https://www.google.com/maps/search/?api=1&query=Touch%20Clinic%20Nahariya%20Israel"
+            href="https://www.google.com/maps/search/?api=1&query=La%20Clinica%20Nahariya%20Israel"
             target="_blank"
             rel="noopener"
           >פתח ניווט</a>
           <a class="location-link" href="tel:+972532452995">התקשרו לקליניקה</a>
         </div>
       </div>
-      <div class="map-wrap" aria-label="Map showing Touch Clinic in Nahariya, Israel">
+      <div class="map-wrap" aria-label="Map showing La Clinica in Nahariya, Israel">
         <iframe
-          title="Touch Clinic Nahariya map"
-          src="https://www.google.com/maps?q=Touch%20Clinic%20Nahariya%20Israel&output=embed"
+          title="La Clinica Nahariya map"
+          src="https://www.google.com/maps?q=La%20Clinica%20Nahariya%20Israel&output=embed"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           allowfullscreen>
@@ -2025,6 +2025,7 @@
 const ADMIN_STORE = 'clinicAdminContentV1';
 const DEFAULT_DOCTOR_PHOTO = 'assets/doctor-photo.jpg';
 const OLD_HERO_DOCTOR = 'Dr. Jonathan Behar · Aesthetic Medicine';
+const OLD_LOCATION_TITLE = 'Touch Clinic, נהריה';
 let ADMIN_CONTENT = null;
 try { ADMIN_CONTENT = JSON.parse(localStorage.getItem(ADMIN_STORE) || 'null'); } catch(e) { ADMIN_CONTENT = null; }
 
@@ -2065,7 +2066,7 @@ function applyAdminContent(){
   adminText('.about-name', c.about && c.about.name);
   adminText('.about-role', c.about && c.about.role);
   adminText('.about-bio', c.about && c.about.bio);
-  adminText('.location-title', c.location && c.location.title);
+  adminText('.location-title', c.location && c.location.title === OLD_LOCATION_TITLE ? null : c.location && c.location.title);
   adminText('.location-address', c.location && c.location.description);
 
   if(c.images && c.images.doctorPhoto && c.images.doctorPhoto !== DEFAULT_DOCTOR_PHOTO){
